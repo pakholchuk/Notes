@@ -15,4 +15,7 @@
     <string name="close">CLOSE</string>
     <string name="delete">DELETE</string>
     <string name="save">SAVE</string>
+    <string name="delete_all">Delete all notes</string>
+    <string name="delete_all_sure">Delete all notes. Are you sure?</string>
+    <string name="cancel">CANCEL</string>
 </resources>

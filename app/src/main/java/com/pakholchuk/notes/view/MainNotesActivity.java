@@ -2,19 +2,16 @@ package com.pakholchuk.notes.view;
 
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.pakholchuk.notes.contracts.PresenterContract;
-import com.pakholchuk.notes.contracts.ViewContract;
+import com.pakholchuk.notes.Contract;
 import com.pakholchuk.notes.databinding.ActivityMainNotesBinding;
-import com.pakholchuk.notes.databinding.ContentMainNotesBinding;
 import com.pakholchuk.notes.presenter.Presenter;
 import com.pakholchuk.notes.repository.Note;
 import com.pakholchuk.notes.R;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,13 +44,17 @@ import java.util.ArrayList;
 *Дата создания;
 *Дата изменения.
  */
-public class MainNotesActivity extends AppCompatActivity implements ViewContract, NotesAdapter.OnItemClickListener {
+public class MainNotesActivity extends AppCompatActivity implements Contract.ViewContract,
+        NotesAdapter.OnItemClickListener, OnFragmentButtonClickListener,
+        DeleteAllDialogFragment.DialogListener {
 
     private ActivityMainNotesBinding activityBinding;
-    private PresenterContract presenter;
+    private Contract.PresenterContract presenter;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter recyclerAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    private Fragment fragment;
+    private DialogFragment dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,18 +64,32 @@ public class MainNotesActivity extends AppCompatActivity implements ViewContract
         init();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.detachView();
+    }
+
     private void init() {
         setSupportActionBar(activityBinding.toolbar);
 
         activityBinding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                add();
+
             }
         });
         presenter = new Presenter(this);
         initRecycler();
+    }
+
+    private void add() {
+        fragment = new EditNoteFragment();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.main_container, fragment, EditNoteFragment.TAG_ADD)
+                .addToBackStack(EditNoteFragment.TAG_ADD)
+                .commit();
     }
 
     private void initRecycler() {
@@ -86,15 +101,23 @@ public class MainNotesActivity extends AppCompatActivity implements ViewContract
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_settings) {
-            inflateSettingsDialog();
+            inflatePreferenceFragment();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void inflateSettingsDialog() {
+    private void inflatePreferenceFragment() {
+        dialog = new DeleteAllDialogFragment();
+        dialog.show(getSupportFragmentManager(), "DeleteAllDialogFragment");
     }
 
     @Override
@@ -135,5 +158,42 @@ public class MainNotesActivity extends AppCompatActivity implements ViewContract
     @Override
     public void onItemClick(View view, int position) {
         presenter.itemClicked(view, position);
+    }
+
+    @Override
+    public void onFragmentButtonClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_save : {
+                presenter.add();
+                break;
+            }
+            case R.id.btn_close : {
+                onBackPressed();
+                break;
+            }
+            case R.id.btn_delete : {
+                presenter.delete();
+                break;
+            }
+            case R.id.btn_edit : {
+                presenter.edit();
+                break;
+            }
+            case (R.id.iv_new_picture|R.id.iv_show_picture) : {
+                presenter.imagePressed(view);
+                break;
+            }
+            default:break;
+        }
+    }
+
+    @Override
+    public void onDialogPositiveClick() {
+        presenter.clearList();
+    }
+
+    @Override
+    public void onDialogNegativeClick() {
+        dialog.dismiss();
     }
 }

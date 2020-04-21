@@ -1,11 +1,11 @@
 package com.pakholchuk.notes.presenter;
 
-import com.pakholchuk.notes.contracts.PresenterContract;
-import com.pakholchuk.notes.contracts.ViewContract;
-import com.pakholchuk.notes.view.MainNotesActivity;
+import android.view.View;
 
-public class Presenter implements PresenterContract {
-    public Presenter(ViewContract view) {
+import com.pakholchuk.notes.Contract;
+
+public class Presenter implements Contract.PresenterContract {
+    public Presenter(Contract.ViewContract view) {
     }
 
     @Override
@@ -29,12 +29,17 @@ public class Presenter implements PresenterContract {
     }
 
     @Override
-    public void attachView() {
+    public void detachView() {
 
     }
 
     @Override
-    public void detachView() {
+    public void itemClicked(View view, int position) {
+
+    }
+
+    @Override
+    public void imagePressed(View view) {
 
     }
 }

@@ -27,6 +27,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:maxLines="16"
+        android:scrollbars="vertical"
         android:textAlignment="viewStart"
         tools:text="lores ipslores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum um lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum " />
 
