@@ -7,22 +7,20 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import com.pakholchuk.notes.data.Note;
 import com.pakholchuk.notes.databinding.FragmentNoteBinding;
 
 public class NoteFragment extends Fragment {
-
-    private OnFragmentButtonClickListener buttonClickListener;
+    public static final String TAG_SHOW = "show";
+    private OnFragmentEventListener buttonClickListener;
     private FragmentNoteBinding binding;
+    private final String defaultValue = "";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         binding = FragmentNoteBinding.inflate(inflater, container, false);
-        buttonClickListener = (OnFragmentButtonClickListener) getActivity();
-        return binding.getRoot();
-    }
-
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        buttonClickListener = (OnFragmentEventListener) getActivity();
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -33,6 +31,21 @@ public class NoteFragment extends Fragment {
         binding.btnDelete.setOnClickListener(onClickListener);
         binding.btnEdit.setOnClickListener(onClickListener);
         binding.ivShowPicture.setOnClickListener(onClickListener);
+        return binding.getRoot();
+    }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            binding.tvFragmentName.setText(bundle.getString(Note.NAME, defaultValue));
+            binding.tvFragmentBody.setText(bundle.getString(Note.BODY, defaultValue));
+            binding.tvFragmentCreationDate.setText(bundle.getString(Note.CREATION, defaultValue));
+            binding.tvFragmentEditdate.setText(bundle.getString(Note.EDIT, defaultValue));
+            if (bundle.getString(Note.IMAGE).equals("")) {
+                binding.ivShowPicture.setVisibility(View.GONE);
+            }
+        }
 
     }
 }

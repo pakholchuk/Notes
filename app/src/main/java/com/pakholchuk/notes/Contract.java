@@ -1,8 +1,9 @@
 package com.pakholchuk.notes;
 
+import android.os.Bundle;
 import android.view.View;
 
-import com.pakholchuk.notes.repository.Note;
+import com.pakholchuk.notes.data.Note;
 
 import java.util.ArrayList;
 
@@ -13,8 +14,10 @@ public interface Contract {
         void delete();
         void clearList();
         void detachView();
-        void itemClicked(View view, int position);
-        void imagePressed(View view);
+        void itemClicked( int position);
+        void imagePressed();
+        void newNotePressed();
+        void save();
     }
 
     interface ViewContract {
@@ -23,18 +26,33 @@ public interface Contract {
         void showProgress();
         void hideProgress();
         void showChangeNoteFragment();
-        void showNote();
+        void showNote(Bundle bundle);
         void closeNote();
 
+        Bundle getDataFromUser();
+
+        void addItem(Object object);
+
+        void showEditFragment(String tag, Bundle bundle);
+
+        void editItem(int noteId, Note note);
+
+        void removeItem(int noteId);
+
+        void clearAll();
+
+        void showImageFragment(String imgPath);
     }
 
     interface RepositoryContract {
-        Note getNote();
-        void deleteNote();
-        void addNote();
+        Note getNote(int id);
+        void deleteNote(int noteId);
+        void addNote(Note note);
         void clearAll();
         ArrayList<Note> getAllNotes();
         void applyChangesToNote();
+        void editNote(int noteId, Bundle b);
 
+        void newNote(Bundle b);
     }
 }

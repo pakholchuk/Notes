@@ -5,13 +5,12 @@ import android.os.Bundle;
 import com.pakholchuk.notes.Contract;
 import com.pakholchuk.notes.databinding.ActivityMainNotesBinding;
 import com.pakholchuk.notes.presenter.Presenter;
-import com.pakholchuk.notes.repository.Note;
+import com.pakholchuk.notes.data.Note;
 import com.pakholchuk.notes.R;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,16 +44,17 @@ import java.util.ArrayList;
 *Дата изменения.
  */
 public class MainNotesActivity extends AppCompatActivity implements Contract.ViewContract,
-        NotesAdapter.OnItemClickListener, OnFragmentButtonClickListener,
+        NotesAdapter.OnItemClickListener, OnFragmentEventListener,
         DeleteAllDialogFragment.DialogListener {
 
     private ActivityMainNotesBinding activityBinding;
     private Contract.PresenterContract presenter;
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter recyclerAdapter;
+    private NotesAdapter recyclerAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    private Fragment fragment;
+    private EditNoteFragment editNoteFragment;
     private DialogFragment dialog;
+    private NoteFragment noteFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,31 +65,55 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     }
 
     @Override
+    public void addItem(Object object) {
+        recyclerAdapter.addNewNote((Note)object);
+    }
+
+    @Override
+    public void removeItem(int noteId) {
+        recyclerAdapter.deleteNote(noteId);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         presenter.detachView();
     }
 
+    @Override
+    public void clearAll() {
+        recyclerAdapter.clearAll();
+    }
+
     private void init() {
         setSupportActionBar(activityBinding.toolbar);
-
+        presenter = new Presenter(this);
         activityBinding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                add();
-
+                presenter.newNotePressed();
             }
         });
-        presenter = new Presenter(this);
         initRecycler();
     }
-
-    private void add() {
-        fragment = new EditNoteFragment();
+    @Override
+    public void showEditFragment(String tag, Bundle bundle) {
+        editNoteFragment = new EditNoteFragment();
+        editNoteFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.main_container, fragment, EditNoteFragment.TAG_ADD)
-                .addToBackStack(EditNoteFragment.TAG_ADD)
+                .add(R.id.main_container, editNoteFragment, tag)
+                .addToBackStack(tag)
                 .commit();
+    }
+
+    @Override
+    public void editItem(int noteId, Note note) {
+        recyclerAdapter.editNote(note, noteId);
+    }
+
+    @Override
+    public Bundle getDataFromUser(){
+        return editNoteFragment.getData();
     }
 
     private void initRecycler() {
@@ -146,29 +170,51 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     }
 
     @Override
-    public void showNote() {
+    public void showNote(Bundle bundle) {
+        noteFragment = new NoteFragment();
+        noteFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .addToBackStack(NoteFragment.TAG_SHOW)
+                .add(editNoteFragment, NoteFragment.TAG_SHOW)
+                .commit();
+    }
+
+    @Override
+    public void showImageFragment(String imgPath) {
+        ImageFragment imageFragment = new ImageFragment();
+        getSupportFragmentManager().beginTransaction()
+                .addToBackStack(Note.IMAGE)
+                .add(imageFragment, Note.IMAGE);
 
     }
 
     @Override
     public void closeNote() {
-
+        if(noteFragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(noteFragment).commit();
+        }
+        if(editNoteFragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(editNoteFragment).commit();
+        }
     }
 
     @Override
-    public void onItemClick(View view, int position) {
-        presenter.itemClicked(view, position);
+    public void onItemClick(int position) {
+        presenter.itemClicked(position);
     }
 
     @Override
     public void onFragmentButtonClick(View view) {
         switch (view.getId()) {
-            case R.id.btn_save : {
+            case R.id.btn_save_new: {
                 presenter.add();
                 break;
             }
+            case R.id.btn_save: {
+                presenter.save();
+            }
             case R.id.btn_close : {
-                onBackPressed();
+                closeNote();
                 break;
             }
             case R.id.btn_delete : {
@@ -179,8 +225,8 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
                 presenter.edit();
                 break;
             }
-            case (R.id.iv_new_picture|R.id.iv_show_picture) : {
-                presenter.imagePressed(view);
+            case (R.id.iv_show_picture) : {
+                presenter.imagePressed();
                 break;
             }
             default:break;

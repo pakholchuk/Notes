@@ -2,6 +2,6 @@ package com.pakholchuk.notes.view;
 
 import android.view.View;
 
-public interface OnFragmentButtonClickListener {
+public interface OnFragmentEventListener {
     void onFragmentButtonClick(View view);
 }

@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pakholchuk.notes.databinding.NoteItemBinding;
-import com.pakholchuk.notes.repository.Note;
+import com.pakholchuk.notes.data.Note;
 
 import java.util.ArrayList;
 
@@ -76,12 +76,12 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         @Override
         public void onClick(View v) {
-            onItemClickListener.onItemClick(binding.getRoot(), getAdapterPosition());
+            onItemClickListener.onItemClick(getAdapterPosition());
         }
     }
 
     public interface OnItemClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick(int position);
     }
 
 }
