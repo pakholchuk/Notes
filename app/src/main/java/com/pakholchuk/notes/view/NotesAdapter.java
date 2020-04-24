@@ -34,7 +34,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         notes.clear();
         notifyDataSetChanged();
     }
-    void editNote(Note note, int position) {
+    void editNote(int position, Note note) {
         notes.set(position, note);
         notifyItemChanged(position);
     }
@@ -52,7 +52,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
         holder.binding.tvItemName.setText(notes.get(position).getName());
-        String dateText = "Last changed: " + notes.get(position).getLastEditDate();
+        String dateText = notes.get(position).getLastEditDate();
         holder.binding.tvItemDate.setText(dateText);
     }
 
@@ -76,12 +76,14 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         @Override
         public void onClick(View v) {
-            onItemClickListener.onItemClick(getAdapterPosition());
+            int position = getAdapterPosition();
+            long noteId = notes.get(position).getId();
+            onItemClickListener.onItemClick(position, noteId);
         }
     }
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onItemClick(int position, long noteId);
     }
 
 }

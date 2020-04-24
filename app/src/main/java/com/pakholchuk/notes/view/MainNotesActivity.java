@@ -3,6 +3,7 @@ package com.pakholchuk.notes.view;
 import android.os.Bundle;
 
 import com.pakholchuk.notes.Contract;
+import com.pakholchuk.notes.data.NoteFields;
 import com.pakholchuk.notes.databinding.ActivityMainNotesBinding;
 import com.pakholchuk.notes.presenter.Presenter;
 import com.pakholchuk.notes.data.Note;
@@ -62,27 +63,22 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
         activityBinding = ActivityMainNotesBinding.inflate(getLayoutInflater());
         setContentView(activityBinding.getRoot());
         init();
+        presenter.viewReady();
     }
 
     @Override
-    public void addItem(Object object) {
-        recyclerAdapter.addNewNote((Note)object);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
     }
 
     @Override
-    public void removeItem(int noteId) {
-        recyclerAdapter.deleteNote(noteId);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        presenter.detachView();
-    }
-
-    @Override
-    public void clearAll() {
-        recyclerAdapter.clearAll();
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_settings) {
+            showOptionsDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void init() {
@@ -96,6 +92,45 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
         });
         initRecycler();
     }
+
+    private void initRecycler() {
+        recyclerView = activityBinding.contentMain.recyclerMain;
+        recyclerAdapter = new NotesAdapter(this);
+        layoutManager = new GridLayoutManager(this, 2, RecyclerView.VERTICAL, false);
+        recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setLayoutManager(layoutManager);
+    }
+
+    @Override
+    public void showList(ArrayList<Note> notes) {
+        recyclerAdapter.updateNotesList(notes);
+    }
+
+    @Override
+    public void clearAll() {
+        recyclerAdapter.clearAll();
+    }
+
+    @Override
+    public void addItem(Object object) {
+        recyclerAdapter.addNewNote((Note)object);
+    }
+
+    @Override
+    public void showNote(Bundle bundle) {
+        noteFragment = new NoteFragment();
+        noteFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .addToBackStack(NoteFragment.TAG_SHOW)
+                .add(noteFragment, NoteFragment.TAG_SHOW)
+                .commit();
+    }
+
+    @Override
+    public void editItem(int position, Note note) {
+        recyclerAdapter.editNote(position, note);
+    }
+
     @Override
     public void showEditFragment(String tag, Bundle bundle) {
         editNoteFragment = new EditNoteFragment();
@@ -107,85 +142,17 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     }
 
     @Override
-    public void editItem(int noteId, Note note) {
-        recyclerAdapter.editNote(note, noteId);
-    }
-
-    @Override
     public Bundle getDataFromUser(){
         return editNoteFragment.getData();
-    }
-
-    private void initRecycler() {
-        recyclerView = activityBinding.contentMain.recyclerMain;
-        recyclerAdapter = new NotesAdapter(this);
-        layoutManager = new GridLayoutManager(this, 2, RecyclerView.VERTICAL, false);
-        recyclerView.setAdapter(recyclerAdapter);
-        recyclerView.setLayoutManager(layoutManager);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            inflatePreferenceFragment();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void inflatePreferenceFragment() {
-        dialog = new DeleteAllDialogFragment();
-        dialog.show(getSupportFragmentManager(), "DeleteAllDialogFragment");
-    }
-
-    @Override
-    public void showList(ArrayList<Note> notes) {
-
-    }
-
-    @Override
-    public void resetList() {
-
-    }
-
-    @Override
-    public void showProgress() {
-
-    }
-
-    @Override
-    public void hideProgress() {
-
-    }
-
-    @Override
-    public void showChangeNoteFragment() {
-
-    }
-
-    @Override
-    public void showNote(Bundle bundle) {
-        noteFragment = new NoteFragment();
-        noteFragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction()
-                .addToBackStack(NoteFragment.TAG_SHOW)
-                .add(editNoteFragment, NoteFragment.TAG_SHOW)
-                .commit();
     }
 
     @Override
     public void showImageFragment(String imgPath) {
         ImageFragment imageFragment = new ImageFragment();
         getSupportFragmentManager().beginTransaction()
-                .addToBackStack(Note.IMAGE)
-                .add(imageFragment, Note.IMAGE);
-
+                .addToBackStack(NoteFields.IMAGE)
+                .add(imageFragment, NoteFields.IMAGE)
+                .commit();
     }
 
     @Override
@@ -199,8 +166,23 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     }
 
     @Override
-    public void onItemClick(int position) {
-        presenter.itemClicked(position);
+    public void removeItem(int position) {
+        recyclerAdapter.deleteNote(position);
+    }
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void hideProgress() {
+
+    }
+
+    @Override
+    public void onItemClick(int position, long noteId) {
+        presenter.itemClicked(position, noteId);
     }
 
     @Override
@@ -233,6 +215,11 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
         }
     }
 
+    private void showOptionsDialog() {
+        dialog = new DeleteAllDialogFragment();
+        dialog.show(getSupportFragmentManager(), "DeleteAllDialogFragment");
+    }
+
     @Override
     public void onDialogPositiveClick() {
         presenter.clearList();
@@ -241,5 +228,11 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     @Override
     public void onDialogNegativeClick() {
         dialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.detachView();
     }
 }
