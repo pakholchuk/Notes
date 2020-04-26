@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.pakholchuk.notes.data.NoteFields;
+import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.databinding.FragmentNoteBinding;
 
 public class NoteFragment extends Fragment {
@@ -38,11 +38,11 @@ public class NoteFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
         if (bundle != null) {
-            binding.tvFragmentName.setText(bundle.getString(NoteFields.NAME, defaultValue));
-            binding.tvFragmentBody.setText(bundle.getString(NoteFields.BODY, defaultValue));
-            binding.tvFragmentCreationDate.setText(bundle.getString(NoteFields.CREATION, defaultValue));
-            binding.tvFragmentEditdate.setText(bundle.getString(NoteFields.EDIT, defaultValue));
-            if (bundle.getString(NoteFields.IMAGE).equals("")) {
+            binding.tvFragmentName.setText(bundle.getString(NoteConstants.NAME, defaultValue));
+            binding.tvFragmentBody.setText(bundle.getString(NoteConstants.BODY, defaultValue));
+            binding.tvFragmentCreationDate.setText(bundle.getString(NoteConstants.CREATION, defaultValue));
+            binding.tvFragmentEditdate.setText(bundle.getString(NoteConstants.EDIT, defaultValue));
+            if (bundle.getString(NoteConstants.IMAGE).equals("")) {
                 binding.ivShowPicture.setVisibility(View.GONE);
             }
         }

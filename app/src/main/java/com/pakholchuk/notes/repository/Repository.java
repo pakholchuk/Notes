@@ -4,109 +4,93 @@ import android.os.Bundle;
 
 import com.pakholchuk.notes.Contract;
 import com.pakholchuk.notes.data.Note;
-import com.pakholchuk.notes.data.NoteFields;
+import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.App;
 import com.pakholchuk.notes.database.MainDatabase;
 import com.pakholchuk.notes.database.NoteDao;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 
 public class Repository implements Contract.RepositoryContract {
 
+    private Contract.PresenterContract presenter;
     private MainDatabase database;
     private NoteDao noteDao;
-    private ArrayList<Note> notes = new ArrayList<>();
     private Note note;
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public Repository() {
+    public Repository(Contract.PresenterContract presenter) {
         database = App.getInstance().getDatabase();
         noteDao = database.noteDao();
+        this.presenter = presenter;
     }
 
     @Override
     public void clearAll() {
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });
+        noteDao.deleteAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
     @Override
-    public ArrayList<Note> getAllNotes() {
-        notes.clear();
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                notes = (ArrayList<Note>)noteDao.getAll();
-            }
-        });
-        return notes;
+    public void loadAllNotes() {
+        noteDao.getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(presenter::noteListReady);
     }
 
     @Override
-    public Note getNote(final long id) {
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                note = noteDao.getById(id);
-            }
-        });
-        return note;
+    public void loadNote(long id) {
+        noteDao.getById(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(note -> presenter.noteLoaded(note));
     }
 
     @Override
-    public Note insert(Bundle b) {
+    public void insert(Bundle b) {
         String creation = "created: " + getSimpleDate();
         String edit = "last edit: " + getSimpleDate();
         long id = System.currentTimeMillis();
-        note = new Note(id, b.getString(NoteFields.NAME),
-                b.getString(NoteFields.BODY),
-                b.getString(NoteFields.IMAGE),
+        note = new Note(id, b.getString(NoteConstants.NAME),
+                b.getString(NoteConstants.BODY),
+                b.getString(NoteConstants.IMAGE),
                 creation, edit);
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                noteDao.insert(note);
-            }
-        });
-        return note;
+        noteDao.insert(note)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> presenter.noteInserted(note));
     }
 
     @Override
     public void update(Note n, Bundle b) {
-        n.setName(b.getString(NoteFields.NAME));
-        n.setBody(b.getString(NoteFields.BODY));
-        n.setImgPath(b.getString(NoteFields.IMAGE));
+        n.setName(b.getString(NoteConstants.NAME));
+        n.setBody(b.getString(NoteConstants.BODY));
+        n.setImgPath(b.getString(NoteConstants.IMAGE));
         n.setLastEditDate("last edit: " + getSimpleDate());
         note = n;
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                noteDao.update(note);
-            }
-        });
+        noteDao.update(note)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> presenter.noteUpdated(note));
     }
 
     @Override
-    public void delete(final Note n) {
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                noteDao.delete(n);
-            }
-        });
+    public void delete(Note n) {
+        noteDao.delete(note)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
     private String getSimpleDate (){
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
-        String result = sdf.format(new Date(System.currentTimeMillis()));
-        return result;
+        return sdf.format(new Date(System.currentTimeMillis()));
     }
 }

@@ -17,7 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.pakholchuk.notes.R;
-import com.pakholchuk.notes.data.NoteFields;
+import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.databinding.FragmentEditNoteBinding;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -95,9 +95,9 @@ public class EditNoteFragment extends Fragment {
     private void onEditFragmentCreate() {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            binding.etFragmentName.setText(bundle.getString(NoteFields.NAME, defaultStringValue));
-            binding.etFragmentBody.setText(bundle.getString(NoteFields.BODY, defaultStringValue));
-            savedImagePath = bundle.getString(NoteFields.IMAGE, defaultStringValue);
+            binding.etFragmentName.setText(bundle.getString(NoteConstants.NAME, defaultStringValue));
+            binding.etFragmentBody.setText(bundle.getString(NoteConstants.BODY, defaultStringValue));
+            savedImagePath = bundle.getString(NoteConstants.IMAGE, defaultStringValue);
         }
         binding.btnSave.setVisibility(View.VISIBLE);
         binding.btnSaveNew.setVisibility(View.GONE);
@@ -180,9 +180,9 @@ public class EditNoteFragment extends Fragment {
 
     public Bundle getData(){
         Bundle bundle = new Bundle();
-        bundle.putString(NoteFields.NAME, binding.etFragmentName.getText().toString());
-        bundle.putString(NoteFields.BODY, binding.etFragmentBody.getText().toString());
-        bundle.putString(NoteFields.IMAGE, savedImagePath);
+        bundle.putString(NoteConstants.NAME, binding.etFragmentName.getText().toString());
+        bundle.putString(NoteConstants.BODY, binding.etFragmentBody.getText().toString());
+        bundle.putString(NoteConstants.IMAGE, savedImagePath);
         return bundle;
     }
 

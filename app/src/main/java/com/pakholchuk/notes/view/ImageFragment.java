@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.pakholchuk.notes.data.NoteFields;
+import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.databinding.FragmentImageBinding;
 import com.squareup.picasso.Picasso;
 
@@ -25,7 +25,7 @@ public class ImageFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
         if (bundle != null) {
-            Picasso.get().load(getArguments().getString(NoteFields.IMAGE))
+            Picasso.get().load(getArguments().getString(NoteConstants.IMAGE))
                     .into(binding.image);
         }
 

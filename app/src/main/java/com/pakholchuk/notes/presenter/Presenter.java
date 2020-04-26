@@ -4,9 +4,12 @@ import android.os.Bundle;
 
 import com.pakholchuk.notes.Contract;
 import com.pakholchuk.notes.data.Note;
-import com.pakholchuk.notes.data.NoteFields;
+import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.repository.Repository;
 import com.pakholchuk.notes.view.EditNoteFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Presenter implements Contract.PresenterContract {
@@ -19,12 +22,12 @@ public class Presenter implements Contract.PresenterContract {
 
     public Presenter(Contract.ViewContract view) {
         this.view = view;
-        this.repository = new Repository();
+        this.repository = new Repository(this);
     }
 
     @Override
     public void viewReady() {
-        view.showList(repository.getAllNotes());
+        repository.loadAllNotes();
     }
 
     @Override
@@ -33,13 +36,23 @@ public class Presenter implements Contract.PresenterContract {
     }
 
     @Override
+    public void noteListReady(List<Note> noteList) {
+        view.showList((ArrayList<Note>) noteList);
+    }
+
+    @Override
     public void add() {
         view.showProgress();
         Bundle b = view.getDataFromUser();
-        Note newNote = repository.insert(b);
-        view.addItem(newNote);
-        view.hideProgress();
+        repository.insert(b);
         view.closeNote();
+    }
+
+    @Override
+    public void noteInserted(Note note) {
+        this.note = note;
+        view.addItem(note);
+        view.hideProgress();
     }
 
     @Override
@@ -53,10 +66,25 @@ public class Presenter implements Contract.PresenterContract {
         view.showProgress();
         Bundle b = view.getDataFromUser();
         repository.update(note, b);
-        note = repository.getNote(noteId);
+        view.closeNote();
+    }
+
+    @Override
+    public void noteUpdated(Note note) {
         view.editItem(positionInRecycler, note);
         view.hideProgress();
-        view.closeNote();
+    }
+
+    @Override
+    public void noteLoaded(Note note) {
+        this.note = note;
+        bundle = new Bundle();
+        bundle.putString(NoteConstants.NAME, note.getName());
+        bundle.putString(NoteConstants.BODY, note.getBody());
+        bundle.putString(NoteConstants.CREATION, note.getCreationDate());
+        bundle.putString(NoteConstants.EDIT, note.getLastEditDate());
+        bundle.putString(NoteConstants.IMAGE, note.getImgPath());
+        view.showNote(bundle);
     }
 
     @Override
@@ -80,14 +108,7 @@ public class Presenter implements Contract.PresenterContract {
     public void itemClicked(int position, long noteId) {
         this.noteId = noteId;
         positionInRecycler = position;
-        note = repository.getNote(noteId);
-        bundle = new Bundle();
-        bundle.putString(NoteFields.NAME, note.getName());
-        bundle.putString(NoteFields.BODY, note.getBody());
-        bundle.putString(NoteFields.CREATION, note.getCreationDate());
-        bundle.putString(NoteFields.EDIT, note.getLastEditDate());
-        bundle.putString(NoteFields.IMAGE, note.getImgPath());
-        view.showNote(bundle);
+        repository.loadNote(noteId);
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.pakholchuk.notes.view;
 import android.os.Bundle;
 
 import com.pakholchuk.notes.Contract;
-import com.pakholchuk.notes.data.NoteFields;
+import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.databinding.ActivityMainNotesBinding;
 import com.pakholchuk.notes.presenter.Presenter;
 import com.pakholchuk.notes.data.Note;
@@ -84,12 +84,7 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     private void init() {
         setSupportActionBar(activityBinding.toolbar);
         presenter = new Presenter(this);
-        activityBinding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                presenter.newNotePressed();
-            }
-        });
+        activityBinding.fab.setOnClickListener(view -> presenter.newNotePressed());
         initRecycler();
     }
 
@@ -150,8 +145,8 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     public void showImageFragment(String imgPath) {
         ImageFragment imageFragment = new ImageFragment();
         getSupportFragmentManager().beginTransaction()
-                .addToBackStack(NoteFields.IMAGE)
-                .add(imageFragment, NoteFields.IMAGE)
+                .addToBackStack(NoteConstants.IMAGE)
+                .add(imageFragment, NoteConstants.IMAGE)
                 .commit();
     }
 

@@ -10,22 +10,28 @@ import com.pakholchuk.notes.data.Note;
 
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+
 @Dao
 public interface NoteDao {
     @Query("SELECT * FROM note")
-    List<Note> getAll();
+    Observable<List<Note>> getAll();
 
     @Query("SELECT * FROM note WHERE id = :id")
-    Note getById(long id);
+    Observable<Note> getById(long id);
+
+    @Query("DELETE FROM note")
+    Completable deleteAll();
 
     @Insert
-    void insert(Note note);
+    Completable insert(Note note);
 
     @Update
-    void update(Note note);
+    Completable update(Note note);
 
     @Delete
-    void delete(Note note);
+    Completable delete(Note note);
 
 
 }

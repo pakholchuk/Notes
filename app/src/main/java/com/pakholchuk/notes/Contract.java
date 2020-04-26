@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.pakholchuk.notes.data.Note;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface Contract {
     interface PresenterContract {
@@ -18,6 +19,14 @@ public interface Contract {
         void newNotePressed();
         void save();
         void viewReady();
+
+        void noteListReady(List<Note> noteList);
+
+        void noteLoaded(Note note);
+
+        void noteInserted(Note note);
+
+        void noteUpdated(Note note);
     }
 
     interface ViewContract {
@@ -36,10 +45,10 @@ public interface Contract {
     }
 
     interface RepositoryContract {
-        Note getNote(long id);
+        void loadNote(long id);
         void clearAll();
-        ArrayList<Note> getAllNotes();
-        Note insert(Bundle b);
+        void loadAllNotes();
+        void insert(Bundle b);
         void update(Note note, Bundle b);
         void delete(Note noteId);
     }
