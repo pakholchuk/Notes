@@ -20,17 +20,17 @@ import com.pakholchuk.notes.R;
 import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.databinding.FragmentEditNoteBinding;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 public class EditNoteFragment extends Fragment {
     public static final String TAG_ADD = "add";
@@ -41,6 +41,7 @@ public class EditNoteFragment extends Fragment {
     private Context context;
     private String savedImagePath = "";
     private String defaultStringValue = "";
+    private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,22 +65,12 @@ public class EditNoteFragment extends Fragment {
                 break;
             }
         }
-        View.OnClickListener onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onFragmentEventListener.onFragmentButtonClick(v);
-            }
-        };
+        View.OnClickListener onClickListener = v -> onFragmentEventListener.onFragmentButtonClick(v);
         binding.btnSave.setOnClickListener(onClickListener);
         binding.btnSaveNew.setOnClickListener(onClickListener);
         binding.btnClose.setOnClickListener(onClickListener);
         binding.btnDelete.setOnClickListener(onClickListener);
-        binding.ivNewPicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickImage();
-            }
-        });
+        binding.ivNewPicture.setOnClickListener(v -> pickImage());
     }
 
     private void onAddFragmentCreate() {
@@ -129,48 +120,35 @@ public class EditNoteFragment extends Fragment {
         binding.btnSave.setEnabled(false);
         binding.ivNewPicture.setVisibility(View.GONE);
         binding.progress.setVisibility(View.VISIBLE);
-        saveImage(uriFrom);
+
+        disposables.add(saveImage(uriFrom)
+                .flatMap((Function<Bitmap, Single<String>>) bitmap -> Single
+                        .create(emitter -> emitter.onSuccess(saveImageInApp(bitmap))))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::onImageSaved));
     }
 
-    private void saveImage(Uri uriFrom) {
-            Picasso.get().load(uriFrom).into(new Target() {
-                @Override
-                public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                    ExecutorService executorService = Executors.newSingleThreadExecutor();
-                    Future<String> future = executorService.submit(new Callable<String>() {
-                        @Override
-                        public String call() {
-                            String path = (context
-                                    .getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
-                            String name = System.currentTimeMillis() + ".jpg";
-                            File file = new File(path, name);
-                            try {
-                                OutputStream stream = new FileOutputStream(file);
-                                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-                                stream.flush();
-                                stream.close();
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            savedImagePath = file.getPath();
-                            return savedImagePath;
-                        }
-
-                    });
-                    while (!future.isDone()){
-                        onImageSaved();
-                    }
-                }
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {}
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {}
-            });
+    private Single<Bitmap> saveImage(Uri uriFrom) {
+        return Single.create(emitter -> {
+          emitter.onSuccess(Picasso.get().load(uriFrom).get());
+        });
     }
 
-    private void onImageSaved() {
+    private String saveImageInApp(Bitmap bitmap) throws IOException {
+        String path = (context
+                .getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
+        String name = System.currentTimeMillis() + ".jpg";
+        File file = new File(path, name);
+        OutputStream stream = new FileOutputStream(file);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+        stream.flush();
+        stream.close();
+        return file.getAbsolutePath();
+    }
+
+    private void onImageSaved(String s) {
+        savedImagePath = s;
         binding.progress.setVisibility(View.GONE);
         binding.btnSave.setEnabled(true);
         binding.ivNewPicture.setImageResource(R.drawable.ic_image_black_24dp);
@@ -186,4 +164,9 @@ public class EditNoteFragment extends Fragment {
         return bundle;
     }
 
+    @Override
+    public void onDestroyView() {
+        disposables.dispose();
+        super.onDestroyView();
+    }
 }
