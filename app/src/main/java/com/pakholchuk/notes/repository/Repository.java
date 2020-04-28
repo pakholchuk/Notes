@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -22,6 +23,7 @@ public class Repository implements Contract.RepositoryContract {
     private MainDatabase database;
     private NoteDao noteDao;
     private Note note;
+    private CompositeDisposable disposables = new CompositeDisposable();
 
     public Repository(Contract.PresenterContract presenter) {
         database = App.getInstance().getDatabase();
@@ -39,18 +41,18 @@ public class Repository implements Contract.RepositoryContract {
 
     @Override
     public void loadAllNotes() {
-        noteDao.getAll()
+        disposables.add(noteDao.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(presenter::noteListReady);
+                .subscribe(presenter::noteListReady));
     }
 
     @Override
     public void loadNote(long id) {
-        noteDao.getById(id)
+        disposables.add(noteDao.getById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(note -> presenter.noteLoaded(note));
+                .subscribe(note -> presenter.noteLoaded(note)));
     }
 
     @Override
@@ -62,10 +64,10 @@ public class Repository implements Contract.RepositoryContract {
                 b.getString(NoteConstants.BODY),
                 b.getString(NoteConstants.IMAGE),
                 creation, edit);
-        noteDao.insert(note)
+        disposables.add(noteDao.insert(note)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> presenter.noteInserted(note));
+                .subscribe(() -> presenter.noteInserted(note)));
     }
 
     @Override
@@ -75,10 +77,10 @@ public class Repository implements Contract.RepositoryContract {
         n.setImgPath(b.getString(NoteConstants.IMAGE));
         n.setLastEditDate("last edit: " + getSimpleDate());
         note = n;
-        noteDao.update(note)
+        disposables.add(noteDao.update(note)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> presenter.noteUpdated(note));
+                .subscribe(() -> presenter.noteUpdated(note)));
     }
 
     @Override
@@ -92,5 +94,10 @@ public class Repository implements Contract.RepositoryContract {
     private String getSimpleDate (){
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
         return sdf.format(new Date(System.currentTimeMillis()));
+    }
+
+    @Override
+    public void disposeAll() {
+        disposables.dispose();
     }
 }

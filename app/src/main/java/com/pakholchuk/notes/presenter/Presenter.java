@@ -57,7 +57,6 @@ public class Presenter implements Contract.PresenterContract {
 
     @Override
     public void edit() {
-        view.closeNote();
         view.showEditFragment(EditNoteFragment.TAG_EDIT, bundle);
     }
 
@@ -117,7 +116,8 @@ public class Presenter implements Contract.PresenterContract {
     }
 
     @Override
-    public void detachView() {
+    public void onActivityDestroyed() {
         view = null;
+        repository.disposeAll();
     }
 }

@@ -49,11 +49,7 @@ public class EditNoteFragment extends Fragment {
         binding = FragmentEditNoteBinding.inflate(inflater, container, false);
         onFragmentEventListener = (OnFragmentEventListener) getActivity();
         context = getContext();
-        return binding.getRoot();
-    }
-
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        setListeners();
         String tag = "" + getTag();
         switch (tag) {
             case TAG_ADD : {
@@ -65,6 +61,11 @@ public class EditNoteFragment extends Fragment {
                 break;
             }
         }
+        binding.getRoot().setOnClickListener(v -> {});
+        return binding.getRoot();
+    }
+
+    private void setListeners() {
         View.OnClickListener onClickListener = v -> onFragmentEventListener.onFragmentButtonClick(v);
         binding.btnSave.setOnClickListener(onClickListener);
         binding.btnSaveNew.setOnClickListener(onClickListener);
@@ -73,9 +74,11 @@ public class EditNoteFragment extends Fragment {
         binding.ivNewPicture.setOnClickListener(v -> pickImage());
     }
 
-    private void onAddFragmentCreate() {
+     private void onAddFragmentCreate() {
         binding.btnDelete.setVisibility(View.GONE);
         binding.btnSave.setVisibility(View.GONE);
+        binding.btnSave.setEnabled(false);
+        binding.btnSaveNew.setEnabled(true);
         binding.btnSaveNew.setVisibility(View.VISIBLE);
         binding.etFragmentBody.setText("");
         binding.etFragmentName.setText("");
@@ -91,7 +94,9 @@ public class EditNoteFragment extends Fragment {
             savedImagePath = bundle.getString(NoteConstants.IMAGE, defaultStringValue);
         }
         binding.btnSave.setVisibility(View.VISIBLE);
+        binding.btnSave.setEnabled(true);
         binding.btnSaveNew.setVisibility(View.GONE);
+        binding.btnSaveNew.setEnabled(false);
 
     }
 
@@ -131,7 +136,9 @@ public class EditNoteFragment extends Fragment {
 
     private Single<Bitmap> saveImage(Uri uriFrom) {
         return Single.create(emitter -> {
-          emitter.onSuccess(Picasso.get().load(uriFrom).get());
+          emitter.onSuccess(Picasso.get()
+                  .load(uriFrom)
+                  .get());
         });
     }
 
@@ -144,7 +151,7 @@ public class EditNoteFragment extends Fragment {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
         stream.flush();
         stream.close();
-        return file.getAbsolutePath();
+        return file.getPath();
     }
 
     private void onImageSaved(String s) {

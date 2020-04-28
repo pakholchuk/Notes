@@ -14,6 +14,10 @@
         tools:text="NONONONONONONNO"
         style="@style/TextNoteName"
         android:textSize="14sp"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,4 +25,14 @@
         style="@style/TextNoteDate"
         tools:text="datateteare"/>
 
+        <ImageView
+            android:id="@+id/iv_attachment"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_attachment_black_24dp"
+            android:layout_alignParentEnd="true"
+            android:visibility="gone"
+            tools:visibility="visible"
+            />
+    </RelativeLayout>
 </LinearLayout>

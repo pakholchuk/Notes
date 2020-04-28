@@ -54,6 +54,9 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         holder.binding.tvItemName.setText(notes.get(position).getName());
         String dateText = notes.get(position).getLastEditDate();
         holder.binding.tvItemDate.setText(dateText);
+        if (!notes.get(position).getImgPath().equals("")){
+            holder.binding.ivAttachment.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -72,7 +75,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
             view.setOnClickListener(this);
             onItemClickListener = listener;
         }
-
 
         @Override
         public void onClick(View v) {

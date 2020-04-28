@@ -21,16 +21,12 @@ public class NoteFragment extends Fragment {
             Bundle savedInstanceState) {
         binding = FragmentNoteBinding.inflate(inflater, container, false);
         buttonClickListener = (OnFragmentEventListener) getActivity();
-        View.OnClickListener onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                buttonClickListener.onFragmentButtonClick(v);
-            }
-        };
+        View.OnClickListener onClickListener = v -> buttonClickListener.onFragmentButtonClick(v);
         binding.btnClose.setOnClickListener(onClickListener);
         binding.btnDelete.setOnClickListener(onClickListener);
         binding.btnEdit.setOnClickListener(onClickListener);
         binding.ivShowPicture.setOnClickListener(onClickListener);
+        binding.getRoot().setOnClickListener(v -> {});
         return binding.getRoot();
     }
 

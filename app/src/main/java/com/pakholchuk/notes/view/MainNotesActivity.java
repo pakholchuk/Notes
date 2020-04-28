@@ -116,8 +116,8 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
         noteFragment = new NoteFragment();
         noteFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
+                .add(R.id.main_container, noteFragment, NoteFragment.TAG_SHOW)
                 .addToBackStack(NoteFragment.TAG_SHOW)
-                .add(noteFragment, NoteFragment.TAG_SHOW)
                 .commit();
     }
 
@@ -128,10 +128,11 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
 
     @Override
     public void showEditFragment(String tag, Bundle bundle) {
+
         editNoteFragment = new EditNoteFragment();
         editNoteFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.main_container, editNoteFragment, tag)
+                .replace(R.id.main_container, editNoteFragment, tag)
                 .addToBackStack(tag)
                 .commit();
     }
@@ -142,22 +143,31 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     }
 
     @Override
+    public void onBackPressed() {
+        if(getSupportFragmentManager().getBackStackEntryCount() != 0) {
+            getSupportFragmentManager().popBackStack();
+        }
+        super.onBackPressed();
+    }
+
+    @Override
     public void showImageFragment(String imgPath) {
         ImageFragment imageFragment = new ImageFragment();
+        Bundle b = new Bundle();
+        b.putString(NoteConstants.IMAGE, imgPath);
+        imageFragment.setArguments(b);
         getSupportFragmentManager().beginTransaction()
+                .replace(R.id.image_container, imageFragment)
                 .addToBackStack(NoteConstants.IMAGE)
-                .add(imageFragment, NoteConstants.IMAGE)
                 .commit();
     }
 
     @Override
     public void closeNote() {
-        if(noteFragment != null) {
-            getSupportFragmentManager().beginTransaction().remove(noteFragment).commit();
+        if(getSupportFragmentManager().getBackStackEntryCount() != 0) {
+            getSupportFragmentManager().popBackStack();
         }
-        if(editNoteFragment != null) {
-            getSupportFragmentManager().beginTransaction().remove(editNoteFragment).commit();
-        }
+
     }
 
     @Override
@@ -228,6 +238,7 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        presenter.detachView();
+        presenter.onActivityDestroyed();
+
     }
 }

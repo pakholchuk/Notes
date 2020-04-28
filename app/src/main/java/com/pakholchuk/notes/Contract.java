@@ -13,7 +13,7 @@ public interface Contract {
         void edit();
         void delete();
         void clearList();
-        void detachView();
+        void onActivityDestroyed();
         void itemClicked(int position, long noteId);
         void imagePressed();
         void newNotePressed();
@@ -51,5 +51,6 @@ public interface Contract {
         void insert(Bundle b);
         void update(Note note, Bundle b);
         void delete(Note noteId);
+        void disposeAll();
     }
 }
