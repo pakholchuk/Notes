@@ -7,26 +7,22 @@ import com.pakholchuk.notes.data.Note;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+
 public interface Contract {
     interface PresenterContract {
         void add();
         void edit();
+        void save();
         void delete();
         void clearList();
-        void onActivityDestroyed();
+
         void itemClicked(int position, long noteId);
         void imagePressed();
         void newNotePressed();
-        void save();
         void viewReady();
-
-        void noteListReady(List<Note> noteList);
-
-        void noteLoaded(Note note);
-
-        void noteInserted(Note note);
-
-        void noteUpdated(Note note);
+        void onActivityDestroyed();
     }
 
     interface ViewContract {
@@ -45,12 +41,11 @@ public interface Contract {
     }
 
     interface RepositoryContract {
-        void loadNote(long id);
-        void clearAll();
-        void loadAllNotes();
-        void insert(Bundle b);
-        void update(Note note, Bundle b);
+        Observable<List<Note>> loadAllNotes();
+        Observable<Note> loadNote(long id);
+        Completable insert(Bundle b);
+        Completable update(Note note, Bundle b);
         void delete(Note noteId);
-        void disposeAll();
+        void clearAll();
     }
 }

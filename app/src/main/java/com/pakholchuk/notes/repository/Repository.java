@@ -11,52 +11,43 @@ import com.pakholchuk.notes.database.NoteDao;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
 
 public class Repository implements Contract.RepositoryContract {
 
-    private Contract.PresenterContract presenter;
-    private MainDatabase database;
     private NoteDao noteDao;
     private Note note;
-    private CompositeDisposable disposables = new CompositeDisposable();
 
-    public Repository(Contract.PresenterContract presenter) {
-        database = App.getInstance().getDatabase();
-        noteDao = database.noteDao();
-        this.presenter = presenter;
+    public Repository() {
+        noteDao = App.getInstance().getDatabase().noteDao();
     }
 
     @Override
     public void clearAll() {
         noteDao.deleteAll()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }
 
     @Override
-    public void loadAllNotes() {
-        disposables.add(noteDao.getAll()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(presenter::noteListReady));
+    public Observable<List<Note>> loadAllNotes() {
+        return noteDao.getAll()
+                .subscribeOn(Schedulers.io());
     }
 
     @Override
-    public void loadNote(long id) {
-        disposables.add(noteDao.getById(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(note -> presenter.noteLoaded(note)));
+    public Observable<Note> loadNote(long id) {
+        return noteDao.getById(id)
+                .subscribeOn(Schedulers.io());
     }
 
     @Override
-    public void insert(Bundle b) {
+    public Completable insert(Bundle b) {
         String creation = "created: " + getSimpleDate();
         String edit = "last edit: " + getSimpleDate();
         long id = System.currentTimeMillis();
@@ -64,30 +55,25 @@ public class Repository implements Contract.RepositoryContract {
                 b.getString(NoteConstants.BODY),
                 b.getString(NoteConstants.IMAGE),
                 creation, edit);
-        disposables.add(noteDao.insert(note)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> presenter.noteInserted(note)));
+        return noteDao.insert(note)
+                .subscribeOn(Schedulers.io());
     }
 
     @Override
-    public void update(Note n, Bundle b) {
+    public Completable update(Note n, Bundle b) {
         n.setName(b.getString(NoteConstants.NAME));
         n.setBody(b.getString(NoteConstants.BODY));
         n.setImgPath(b.getString(NoteConstants.IMAGE));
         n.setLastEditDate("last edit: " + getSimpleDate());
         note = n;
-        disposables.add(noteDao.update(note)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> presenter.noteUpdated(note)));
+        return noteDao.update(note)
+                .subscribeOn(Schedulers.io());
     }
 
     @Override
     public void delete(Note n) {
         noteDao.delete(note)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }
 
@@ -96,8 +82,4 @@ public class Repository implements Contract.RepositoryContract {
         return sdf.format(new Date(System.currentTimeMillis()));
     }
 
-    @Override
-    public void disposeAll() {
-        disposables.dispose();
-    }
 }

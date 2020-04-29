@@ -9,7 +9,9 @@ import com.pakholchuk.notes.repository.Repository;
 import com.pakholchuk.notes.view.EditNoteFragment;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 
 
 public class Presenter implements Contract.PresenterContract {
@@ -17,17 +19,19 @@ public class Presenter implements Contract.PresenterContract {
     private final Contract.RepositoryContract repository;
     private Bundle bundle;
     private Note note;
-    private long noteId;
     private int positionInRecycler;
+    private CompositeDisposable disposables = new CompositeDisposable();
 
     public Presenter(Contract.ViewContract view) {
         this.view = view;
-        this.repository = new Repository(this);
+        this.repository = new Repository();
     }
 
     @Override
     public void viewReady() {
-        repository.loadAllNotes();
+        disposables.add(repository.loadAllNotes()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(notes -> view.showList((ArrayList<Note>) notes)));
     }
 
     @Override
@@ -36,20 +40,16 @@ public class Presenter implements Contract.PresenterContract {
     }
 
     @Override
-    public void noteListReady(List<Note> noteList) {
-        view.showList((ArrayList<Note>) noteList);
-    }
-
-    @Override
     public void add() {
         view.showProgress();
         Bundle b = view.getDataFromUser();
-        repository.insert(b);
         view.closeNote();
+        disposables.add(repository.insert(b)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> noteInserted(note)));
     }
 
-    @Override
-    public void noteInserted(Note note) {
+    private void noteInserted(Note note) {
         this.note = note;
         view.addItem(note);
         view.hideProgress();
@@ -64,26 +64,15 @@ public class Presenter implements Contract.PresenterContract {
     public void save() {
         view.showProgress();
         Bundle b = view.getDataFromUser();
-        repository.update(note, b);
         view.closeNote();
+        disposables.add(repository.update(note, b)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> noteUpdated(note)));
     }
 
-    @Override
-    public void noteUpdated(Note note) {
+    private void noteUpdated(Note note) {
         view.editItem(positionInRecycler, note);
         view.hideProgress();
-    }
-
-    @Override
-    public void noteLoaded(Note note) {
-        this.note = note;
-        bundle = new Bundle();
-        bundle.putString(NoteConstants.NAME, note.getName());
-        bundle.putString(NoteConstants.BODY, note.getBody());
-        bundle.putString(NoteConstants.CREATION, note.getCreationDate());
-        bundle.putString(NoteConstants.EDIT, note.getLastEditDate());
-        bundle.putString(NoteConstants.IMAGE, note.getImgPath());
-        view.showNote(bundle);
     }
 
     @Override
@@ -105,9 +94,21 @@ public class Presenter implements Contract.PresenterContract {
 
     @Override
     public void itemClicked(int position, long noteId) {
-        this.noteId = noteId;
         positionInRecycler = position;
-        repository.loadNote(noteId);
+        disposables.add(repository.loadNote(noteId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::noteLoaded));
+    }
+
+    private void noteLoaded(Note note) {
+        this.note = note;
+        bundle = new Bundle();
+        bundle.putString(NoteConstants.NAME, note.getName());
+        bundle.putString(NoteConstants.BODY, note.getBody());
+        bundle.putString(NoteConstants.CREATION, note.getCreationDate());
+        bundle.putString(NoteConstants.EDIT, note.getLastEditDate());
+        bundle.putString(NoteConstants.IMAGE, note.getImgPath());
+        view.showNote(bundle);
     }
 
     @Override
@@ -118,6 +119,6 @@ public class Presenter implements Contract.PresenterContract {
     @Override
     public void onActivityDestroyed() {
         view = null;
-        repository.disposeAll();
+        disposables.dispose();
     }
 }
