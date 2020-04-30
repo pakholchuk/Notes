@@ -18,7 +18,7 @@
             android:background="?attr/colorPrimary"
             app:subtitle="@string/app_name"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:menu="@menu/menu"/>
+            app:menu="@menu/menu" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

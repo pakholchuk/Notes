@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pakholchuk.notes.databinding.NoteItemBinding;
 import com.pakholchuk.notes.data.Note;
+import com.pakholchuk.notes.databinding.NoteItemBinding;
 
 import java.util.ArrayList;
 
@@ -21,27 +21,32 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         this.itemClickListener = itemClickListener;
     }
 
-    void updateNotesList(ArrayList<Note> list){
+    void updateNotesList(ArrayList<Note> list) {
         notes.clear();
         notes = list;
         notifyDataSetChanged();
     }
-    void addNewNote(Note note){
+
+    void addNewNote(Note note) {
         notes.add(note);
         notifyItemInserted(notes.size());
     }
+
     void clearAll() {
         notes.clear();
         notifyDataSetChanged();
     }
+
     void editNote(int position, Note note) {
         notes.set(position, note);
         notifyItemChanged(position);
     }
+
     void deleteNote(int position) {
         notes.remove(position);
         notifyItemRemoved(position);
     }
+
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -54,7 +59,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         holder.binding.tvItemName.setText(notes.get(position).getName());
         String dateText = notes.get(position).getLastEditDate();
         holder.binding.tvItemDate.setText(dateText);
-        if (!notes.get(position).getImgPath().equals("")){
+        if (!notes.get(position).getImgPath().equals("")) {
             holder.binding.ivAttachment.setVisibility(View.VISIBLE);
         }
     }
@@ -71,7 +76,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         NoteViewHolder(@NonNull NoteItemBinding binding, OnItemClickListener listener) {
             super(binding.getRoot());
             View view = binding.getRoot();
-            this.binding=binding;
+            this.binding = binding;
             view.setOnClickListener(this);
             onItemClickListener = listener;
         }

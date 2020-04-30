@@ -1,4 +1,4 @@
-package com.pakholchuk.notes.database;
+package com.pakholchuk.notes.repository.database;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;

@@ -2,12 +2,12 @@ package com.pakholchuk.notes.repository;
 
 import android.os.Bundle;
 
+import com.pakholchuk.notes.App;
 import com.pakholchuk.notes.Contract;
 import com.pakholchuk.notes.data.Note;
 import com.pakholchuk.notes.data.NoteConstants;
-import com.pakholchuk.notes.App;
-import com.pakholchuk.notes.database.MainDatabase;
-import com.pakholchuk.notes.database.NoteDao;
+import com.pakholchuk.notes.helpers.ImageHelper;
+import com.pakholchuk.notes.repository.database.NoteDao;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,6 +15,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -28,11 +29,11 @@ public class Repository implements Contract.RepositoryContract {
     }
 
     @Override
-    public void clearAll() {
-        noteDao.deleteAll()
-                .subscribeOn(Schedulers.io())
-                .subscribe();
+    public Completable clearAll() {
+        return noteDao.deleteAll();
     }
+
+
 
     @Override
     public Observable<List<Note>> loadAllNotes() {
@@ -66,18 +67,19 @@ public class Repository implements Contract.RepositoryContract {
         n.setImgPath(b.getString(NoteConstants.IMAGE));
         n.setLastEditDate("last edit: " + getSimpleDate());
         note = n;
-        return noteDao.update(note)
+        return noteDao.update(n)
                 .subscribeOn(Schedulers.io());
     }
 
     @Override
     public void delete(Note n) {
-        noteDao.delete(note)
+        ImageHelper.deleteImage(n.getImgPath());
+        noteDao.delete(n)
                 .subscribeOn(Schedulers.io())
                 .subscribe();
     }
 
-    private String getSimpleDate (){
+    private String getSimpleDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
         return sdf.format(new Date(System.currentTimeMillis()));
     }

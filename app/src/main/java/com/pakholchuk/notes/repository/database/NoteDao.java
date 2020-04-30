@@ -1,4 +1,4 @@
-package com.pakholchuk.notes.database;
+package com.pakholchuk.notes.repository.database;
 
 import androidx.room.Dao;
 import androidx.room.Delete;

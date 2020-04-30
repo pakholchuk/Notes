@@ -1,10 +1,12 @@
 package com.pakholchuk.notes.presenter;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.pakholchuk.notes.Contract;
 import com.pakholchuk.notes.data.Note;
 import com.pakholchuk.notes.data.NoteConstants;
+import com.pakholchuk.notes.helpers.ImageHelper;
 import com.pakholchuk.notes.repository.Repository;
 import com.pakholchuk.notes.view.EditNoteFragment;
 
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class Presenter implements Contract.PresenterContract {
@@ -21,10 +24,12 @@ public class Presenter implements Contract.PresenterContract {
     private Note note;
     private int positionInRecycler;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private ImageHelper imageHelper;
 
     public Presenter(Contract.ViewContract view) {
         this.view = view;
         this.repository = new Repository();
+        imageHelper = new ImageHelper((Context)view);
     }
 
     @Override
@@ -36,7 +41,7 @@ public class Presenter implements Contract.PresenterContract {
 
     @Override
     public void newNotePressed() {
-        view.showEditFragment(EditNoteFragment.TAG_ADD, null);
+        view.showEditNote(EditNoteFragment.TAG_ADD, null);
     }
 
     @Override
@@ -57,7 +62,8 @@ public class Presenter implements Contract.PresenterContract {
 
     @Override
     public void edit() {
-        view.showEditFragment(EditNoteFragment.TAG_EDIT, bundle);
+        view.closeNote();
+        view.showEditNote(EditNoteFragment.TAG_EDIT, bundle);
     }
 
     @Override
@@ -87,7 +93,10 @@ public class Presenter implements Contract.PresenterContract {
     @Override
     public void clearList() {
         view.showProgress();
-        repository.clearAll();
+        disposables.add(repository.clearAll()
+                .doOnComplete(imageHelper::deleteAllImages)
+                .subscribeOn(Schedulers.io())
+                .subscribe());
         view.clearAll();
         view.hideProgress();
     }
@@ -113,11 +122,17 @@ public class Presenter implements Contract.PresenterContract {
 
     @Override
     public void imagePressed() {
-        view.showImageFragment(note.getImgPath());
+        view.showImage(note.getImgPath());
+    }
+
+    @Override
+    public void cachedImagePressed() {
+        view.showImage(view.getCachedImagePath());
     }
 
     @Override
     public void onActivityDestroyed() {
+        imageHelper = null;
         view = null;
         disposables.dispose();
     }

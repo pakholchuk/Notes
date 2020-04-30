@@ -1,13 +1,9 @@
 package com.pakholchuk.notes.view;
 
 import android.os.Bundle;
-
-import com.pakholchuk.notes.Contract;
-import com.pakholchuk.notes.data.NoteConstants;
-import com.pakholchuk.notes.databinding.ActivityMainNotesBinding;
-import com.pakholchuk.notes.presenter.Presenter;
-import com.pakholchuk.notes.data.Note;
-import com.pakholchuk.notes.R;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,9 +11,12 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import com.pakholchuk.notes.Contract;
+import com.pakholchuk.notes.R;
+import com.pakholchuk.notes.data.Note;
+import com.pakholchuk.notes.data.NoteConstants;
+import com.pakholchuk.notes.databinding.ActivityMainNotesBinding;
+import com.pakholchuk.notes.presenter.Presenter;
 
 import java.util.ArrayList;
 
@@ -108,7 +107,7 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
 
     @Override
     public void addItem(Object object) {
-        recyclerAdapter.addNewNote((Note)object);
+        recyclerAdapter.addNewNote((Note) object);
     }
 
     @Override
@@ -127,8 +126,7 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     }
 
     @Override
-    public void showEditFragment(String tag, Bundle bundle) {
-
+    public void showEditNote(String tag, Bundle bundle) {
         editNoteFragment = new EditNoteFragment();
         editNoteFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
@@ -138,36 +136,40 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     }
 
     @Override
-    public Bundle getDataFromUser(){
+    public Bundle getDataFromUser() {
         return editNoteFragment.getData();
     }
 
     @Override
     public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount() != 0) {
+        if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
             getSupportFragmentManager().popBackStack();
         }
         super.onBackPressed();
     }
 
     @Override
-    public void showImageFragment(String imgPath) {
+    public String getCachedImagePath() {
+        return editNoteFragment.getCachedImagePath();
+    }
+
+    @Override
+    public void showImage(String imgPath) {
         ImageFragment imageFragment = new ImageFragment();
         Bundle b = new Bundle();
         b.putString(NoteConstants.IMAGE, imgPath);
         imageFragment.setArguments(b);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.image_container, imageFragment)
+                .add(R.id.image_container, imageFragment)
                 .addToBackStack(NoteConstants.IMAGE)
                 .commit();
     }
 
     @Override
     public void closeNote() {
-        if(getSupportFragmentManager().getBackStackEntryCount() != 0) {
+        if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
             getSupportFragmentManager().popBackStack();
         }
-
     }
 
     @Override
@@ -191,7 +193,7 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     }
 
     @Override
-    public void onFragmentButtonClick(View view) {
+    public void onFragmentViewClick(View view) {
         switch (view.getId()) {
             case R.id.btn_save_new: {
                 presenter.add();
@@ -200,23 +202,27 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
             case R.id.btn_save: {
                 presenter.save();
             }
-            case R.id.btn_close : {
+            case R.id.btn_close:
+            case R.id.iv_close_image: {
                 closeNote();
                 break;
             }
-            case R.id.btn_delete : {
+            case R.id.btn_delete: {
                 presenter.delete();
                 break;
             }
-            case R.id.btn_edit : {
+            case R.id.btn_edit: {
                 presenter.edit();
                 break;
             }
-            case (R.id.iv_show_picture) : {
-                presenter.imagePressed();
-                break;
+            case (R.id.iv_preview_in_edit_fragment): {
+                presenter.cachedImagePressed();
             }
-            default:break;
+            case R.id.iv_preview: {
+                presenter.imagePressed();
+            }
+            default:
+                break;
         }
     }
 

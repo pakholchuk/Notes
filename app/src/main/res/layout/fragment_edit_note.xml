@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
@@ -31,6 +30,14 @@
         android:textAlignment="viewStart"
         tools:text="lores ipslores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum um lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum " />
 
+    <ImageView
+        android:layout_margin="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/iv_preview_in_edit_fragment"
+        android:layout_below="@id/et_fragment_body"
+        tools:src="@drawable/ic_attachment_black_24dp" />
+
     <ProgressBar
         android:layout_margin="8dp"
         android:layout_width="wrap_content"
@@ -39,7 +46,8 @@
         android:id="@+id/progress"
         android:visibility="gone"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true" />
+
     <ImageView
         android:layout_margin="8dp"
         android:layout_width="wrap_content"
@@ -47,7 +55,8 @@
         android:id="@+id/iv_new_picture"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/ic_add_a_photo_black_24dp"/>
+        android:src="@drawable/ic_add_a_photo_black_24dp" />
+
     <ImageView
         android:layout_margin="4dp"
         android:layout_width="18dp"
@@ -56,38 +65,43 @@
         android:visibility="gone"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/ic_done_black_24dp"/>
+        android:src="@drawable/ic_done_black_24dp" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/et_fragment_body"
+        android:layout_below="@id/iv_preview_in_edit_fragment"
         android:padding="8dp">
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save"
             android:id="@+id/btn_save"
             android:visibility="gone"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save"
             android:id="@+id/btn_save_new"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/delete"
             android:id="@+id/btn_delete"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/close"
             android:id="@+id/btn_close"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center" />
 
     </LinearLayout>
 </RelativeLayout>

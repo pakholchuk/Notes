@@ -12,9 +12,12 @@ import com.pakholchuk.notes.R;
 public class DeleteAllDialogFragment extends DialogFragment {
     public interface DialogListener {
         void onDialogPositiveClick();
+
         void onDialogNegativeClick();
     }
+
     private DialogListener dialogListener;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialogListener = (DialogListener) getActivity();
