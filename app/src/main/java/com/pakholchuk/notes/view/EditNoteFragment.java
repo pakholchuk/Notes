@@ -40,6 +40,7 @@ public class EditNoteFragment extends Fragment {
     private View.OnClickListener onClickListener;
     private String cachedImagePath;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -151,13 +152,12 @@ public class EditNoteFragment extends Fragment {
 
     private String saveImageToCache(Bitmap bitmap) throws IOException {
         if (cachedImagePath != null) {
-            imageHelper.deleteImage(cachedImagePath);
+            ImageHelper.deleteImage(cachedImagePath);
         }
         return imageHelper.getCachedImagePath(bitmap);
     }
 
     private void onImageCached(String s) {
-        Log.d("TAG", "onImageSaved: " + Thread.currentThread());
         cachedImagePath = s;
         binding.progress.setVisibility(View.GONE);
         binding.btnSave.setEnabled(true);
@@ -190,7 +190,7 @@ public class EditNoteFragment extends Fragment {
     public void onDestroyView() {
         disposables.dispose();
         if (cachedImagePath != null) {
-            imageHelper.deleteImage(cachedImagePath);
+            ImageHelper.deleteImage(cachedImagePath);
         }
         super.onDestroyView();
     }

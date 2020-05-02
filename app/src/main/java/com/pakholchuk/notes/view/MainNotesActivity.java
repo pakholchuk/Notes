@@ -96,19 +96,10 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
     }
 
     @Override
-    public void showList(ArrayList<Note> notes) {
+    public void updateList(ArrayList<Note> notes) {
         recyclerAdapter.updateNotesList(notes);
     }
 
-    @Override
-    public void clearAll() {
-        recyclerAdapter.clearAll();
-    }
-
-    @Override
-    public void addItem(Object object) {
-        recyclerAdapter.addNewNote((Note) object);
-    }
 
     @Override
     public void showNote(Bundle bundle) {
@@ -118,11 +109,6 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
                 .add(R.id.main_container, noteFragment, NoteFragment.TAG_SHOW)
                 .addToBackStack(NoteFragment.TAG_SHOW)
                 .commit();
-    }
-
-    @Override
-    public void editItem(int position, Note note) {
-        recyclerAdapter.editNote(position, note);
     }
 
     @Override
@@ -171,22 +157,6 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
             getSupportFragmentManager().popBackStack();
         }
     }
-
-    @Override
-    public void removeItem(int position) {
-        recyclerAdapter.deleteNote(position);
-    }
-
-    @Override
-    public void showProgress() {
-
-    }
-
-    @Override
-    public void hideProgress() {
-
-    }
-
     @Override
     public void onItemClick(int position, long noteId) {
         presenter.itemClicked(position, noteId);
@@ -243,8 +213,9 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        recyclerView.setAdapter(null);
         presenter.onActivityDestroyed();
+        super.onDestroy();
 
     }
 }

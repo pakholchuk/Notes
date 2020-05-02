@@ -15,7 +15,6 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -28,27 +27,20 @@ public class Repository implements Contract.RepositoryContract {
         noteDao = App.getInstance().getDatabase().noteDao();
     }
 
-    @Override
-    public Completable clearAll() {
-        return noteDao.deleteAll();
-    }
-
 
 
     @Override
-    public Observable<List<Note>> loadAllNotes() {
-        return noteDao.getAll()
-                .subscribeOn(Schedulers.io());
+    public Observable<List<Note>> updateList() {
+        return noteDao.getAll();
     }
 
     @Override
     public Observable<Note> loadNote(long id) {
-        return noteDao.getById(id)
-                .subscribeOn(Schedulers.io());
+        return noteDao.getById(id);
     }
 
     @Override
-    public Completable insert(Bundle b) {
+    public void insert(Bundle b) {
         String creation = "created: " + getSimpleDate();
         String edit = "last edit: " + getSimpleDate();
         long id = System.currentTimeMillis();
@@ -56,19 +48,21 @@ public class Repository implements Contract.RepositoryContract {
                 b.getString(NoteConstants.BODY),
                 b.getString(NoteConstants.IMAGE),
                 creation, edit);
-        return noteDao.insert(note)
-                .subscribeOn(Schedulers.io());
+        noteDao.insert(note)
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 
     @Override
-    public Completable update(Note n, Bundle b) {
+    public void update(Note n, Bundle b) {
         n.setName(b.getString(NoteConstants.NAME));
         n.setBody(b.getString(NoteConstants.BODY));
         n.setImgPath(b.getString(NoteConstants.IMAGE));
         n.setLastEditDate("last edit: " + getSimpleDate());
         note = n;
-        return noteDao.update(n)
-                .subscribeOn(Schedulers.io());
+        noteDao.update(n)
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 
     @Override
@@ -77,6 +71,11 @@ public class Repository implements Contract.RepositoryContract {
         noteDao.delete(n)
                 .subscribeOn(Schedulers.io())
                 .subscribe();
+    }
+
+    @Override
+    public Completable clearAll() {
+        return noteDao.deleteAll();
     }
 
     private String getSimpleDate() {

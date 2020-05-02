@@ -5,46 +5,41 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pakholchuk.notes.data.Note;
 import com.pakholchuk.notes.databinding.NoteItemBinding;
+import com.pakholchuk.notes.helpers.NotesDiffUtilCallback;
 
 import java.util.ArrayList;
+
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
     private NoteItemBinding binding;
     private ArrayList<Note> notes = new ArrayList<>();
     private OnItemClickListener itemClickListener;
+    private Disposable disposable;
 
     public NotesAdapter(OnItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
 
-    void updateNotesList(ArrayList<Note> list) {
-        notes.clear();
-        notes = list;
-        notifyDataSetChanged();
-    }
-
-    void addNewNote(Note note) {
-        notes.add(note);
-        notifyItemInserted(notes.size());
-    }
-
-    void clearAll() {
-        notes.clear();
-        notifyDataSetChanged();
-    }
-
-    void editNote(int position, Note note) {
-        notes.set(position, note);
-        notifyItemChanged(position);
-    }
-
-    void deleteNote(int position) {
-        notes.remove(position);
-        notifyItemRemoved(position);
+    void updateNotesList(ArrayList<Note> newList) {
+        NotesDiffUtilCallback notesDiffUtilCallback =
+                new NotesDiffUtilCallback(notes, newList);
+        notes = newList;
+        disposable = Single.create((SingleOnSubscribe<DiffUtil.DiffResult>)
+                emitter -> emitter.onSuccess(DiffUtil
+                        .calculateDiff(notesDiffUtilCallback)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> result.dispatchUpdatesTo(NotesAdapter.this));
     }
 
     @NonNull
@@ -93,4 +88,9 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         void onItemClick(int position, long noteId);
     }
 
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        disposable.dispose();
+        super.onDetachedFromRecyclerView(recyclerView);
+    }
 }

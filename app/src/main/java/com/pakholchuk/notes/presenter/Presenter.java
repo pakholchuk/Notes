@@ -22,7 +22,6 @@ public class Presenter implements Contract.PresenterContract {
     private final Contract.RepositoryContract repository;
     private Bundle bundle;
     private Note note;
-    private int positionInRecycler;
     private CompositeDisposable disposables = new CompositeDisposable();
     private ImageHelper imageHelper;
 
@@ -34,9 +33,10 @@ public class Presenter implements Contract.PresenterContract {
 
     @Override
     public void viewReady() {
-        disposables.add(repository.loadAllNotes()
+        disposables.add(repository.updateList()
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(notes -> view.showList((ArrayList<Note>) notes)));
+                .subscribe(notes -> view.updateList((ArrayList<Note>) notes)));
     }
 
     @Override
@@ -46,19 +46,11 @@ public class Presenter implements Contract.PresenterContract {
 
     @Override
     public void add() {
-        view.showProgress();
         Bundle b = view.getDataFromUser();
         view.closeNote();
-        disposables.add(repository.insert(b)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> noteInserted(note)));
+        repository.insert(b);
     }
 
-    private void noteInserted(Note note) {
-        this.note = note;
-        view.addItem(note);
-        view.hideProgress();
-    }
 
     @Override
     public void edit() {
@@ -68,43 +60,29 @@ public class Presenter implements Contract.PresenterContract {
 
     @Override
     public void save() {
-        view.showProgress();
         Bundle b = view.getDataFromUser();
         view.closeNote();
-        disposables.add(repository.update(note, b)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> noteUpdated(note)));
-    }
-
-    private void noteUpdated(Note note) {
-        view.editItem(positionInRecycler, note);
-        view.hideProgress();
+        repository.update(note, b);
     }
 
     @Override
     public void delete() {
-        view.showProgress();
         repository.delete(note);
-        view.removeItem(positionInRecycler);
-        view.hideProgress();
         view.closeNote();
     }
 
     @Override
     public void clearList() {
-        view.showProgress();
         disposables.add(repository.clearAll()
                 .doOnComplete(imageHelper::deleteAllImages)
                 .subscribeOn(Schedulers.io())
                 .subscribe());
-        view.clearAll();
-        view.hideProgress();
     }
 
     @Override
     public void itemClicked(int position, long noteId) {
-        positionInRecycler = position;
         disposables.add(repository.loadNote(noteId)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::noteLoaded));
     }
