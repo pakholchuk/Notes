@@ -1,4 +1,4 @@
-package com.pakholchuk.notes.view;
+package com.pakholchuk.notes.view.fragments;
 
 import android.app.Dialog;
 import android.content.DialogInterface;

@@ -1,12 +1,12 @@
 package com.pakholchuk.notes.repository;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.pakholchuk.notes.App;
-import com.pakholchuk.notes.Contract;
+import com.pakholchuk.notes.contracts.ContractRepository;
 import com.pakholchuk.notes.data.Note;
 import com.pakholchuk.notes.data.NoteConstants;
-import com.pakholchuk.notes.helpers.ImageHelper;
 import com.pakholchuk.notes.repository.database.NoteDao;
 
 import java.text.SimpleDateFormat;
@@ -14,11 +14,13 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
 
-public class Repository implements Contract.RepositoryContract {
+public class Repository implements ContractRepository {
 
     private NoteDao noteDao;
     private Note note;
@@ -30,7 +32,7 @@ public class Repository implements Contract.RepositoryContract {
 
 
     @Override
-    public Observable<List<Note>> updateList() {
+    public Flowable<List<Note>> getAll() {
         return noteDao.getAll();
     }
 
@@ -49,6 +51,12 @@ public class Repository implements Contract.RepositoryContract {
                 b.getString(NoteConstants.IMAGE),
                 creation, edit);
         noteDao.insert(note)
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.d("FATAL_TAG", "insert: " + note.getId());
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .subscribe();
     }
@@ -67,7 +75,7 @@ public class Repository implements Contract.RepositoryContract {
 
     @Override
     public void delete(Note n) {
-        ImageHelper.deleteImage(n.getImgPath());
+
         noteDao.delete(n)
                 .subscribeOn(Schedulers.io())
                 .subscribe();

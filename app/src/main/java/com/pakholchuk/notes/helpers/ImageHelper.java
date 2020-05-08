@@ -14,13 +14,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.SingleSource;
+import io.reactivex.functions.Function;
 
 public class ImageHelper {
-    private Context context;
-
-    public ImageHelper(Context context) {
-        this.context = context;
-    }
 
     public Single<Bitmap> loadImage(Uri uriFrom) {
         return Single.create(emitter -> {
@@ -28,12 +27,10 @@ public class ImageHelper {
         });
     }
 
-    public Bitmap createPreviewBitmap(final Bitmap bitmap) {
-
+    public Bitmap createPreviewBitmap(final Bitmap bitmap, float density) {
         float bitmapWidth = bitmap.getWidth();
         float bitmapHeight = bitmap.getHeight();
         float ratio = bitmapWidth / bitmapHeight;
-        float density = context.getResources().getDisplayMetrics().density;
         float maxWidthDp = 180;
         float maxHeightDp = 90;
         Bitmap newBitmap;
@@ -51,12 +48,15 @@ public class ImageHelper {
         return newBitmap;
     }
 
-    public String getCachedImagePath(Bitmap bitmap) throws IOException {
+    public Single<Bitmap> getPreviewBitmap(String pathFrom, float deviceDensity) {
+        return loadImage(parseUri(pathFrom))
+                .map(bitmap -> createPreviewBitmap(bitmap, deviceDensity));
+    }
+
+    public String cacheImage(String appImagesDirPath, Bitmap bitmap) throws IOException {
         Log.d("TAG", "saveImageInApp: " + Thread.currentThread());
-        String path = (context
-                .getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString());
         String name = System.currentTimeMillis() + ".jpg";
-        File file = new File(path, name);
+        File file = new File(appImagesDirPath, name);
         OutputStream stream = new FileOutputStream(file);
         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
         stream.flush();
@@ -64,16 +64,29 @@ public class ImageHelper {
         return file.getPath();
     }
 
-    public static void deleteImage(String path) {
+    public Single<String> saveImageToApp(String pathFrom, String pathTo) {
+
+        return loadImage(parseUri(pathFrom))
+                .map(bitmap -> cacheImage(pathTo, bitmap));
+    }
+
+    public Uri parseUri(String path) {
+        if (!path.startsWith("file://")){
+            path = "file://" + path;
+        }
+        return Uri.parse(path);
+    }
+
+
+    public void deleteImage(String path) {
         File file = new File(path);
         file.delete();
     }
 
-    public void deleteAllImages() {
-        File fileList = context
-                .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        if (fileList != null){
-            File[] filenames = fileList.listFiles();
+    public void deleteAllImages(String imagesDirPath) {
+        if (imagesDirPath != null){
+            File dir = new File(imagesDirPath);
+            File[] filenames = dir.listFiles();
             for (File f : filenames){
                 f.delete();
             }

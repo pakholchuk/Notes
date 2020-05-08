@@ -1,4 +1,4 @@
-package com.pakholchuk.notes.view;
+package com.pakholchuk.notes.view.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 
 import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.databinding.FragmentImageBinding;
+import com.pakholchuk.notes.view.OnFragmentEventListener;
 import com.squareup.picasso.Picasso;
 
 public class ImageFragment extends Fragment {

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
-    tools:context=".view.NoteFragment"
+    tools:context=".view.fragments.DetailsFragment"
     android:background="@android:color/darker_gray"
     android:padding="8dp">
 
@@ -11,6 +11,7 @@
         android:id="@+id/et_fragment_name"
         style="@style/TextNoteName"
         android:maxLength="18"
+        android:hint="@string/hint_name"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -20,6 +21,7 @@
         android:id="@+id/et_fragment_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="@string/hint_body"
         android:layout_below="@id/et_fragment_name"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -52,7 +54,7 @@
         android:layout_margin="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/iv_new_picture"
+        android:id="@+id/iv_pick_image"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:src="@drawable/ic_add_a_photo_black_24dp" />

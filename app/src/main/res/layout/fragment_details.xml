@@ -4,7 +4,7 @@
     android:layout_width="300dp"
     android:maxHeight="500dp"
     android:layout_height="wrap_content"
-    tools:context=".view.NoteFragment"
+    tools:context=".view.fragments.DetailsFragment"
     android:background="@android:color/darker_gray"
     android:padding="8dp">
 
