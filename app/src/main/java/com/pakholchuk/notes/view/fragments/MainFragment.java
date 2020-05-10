@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pakholchuk.notes.R;
-import com.pakholchuk.notes.arch.BaseContract;
 import com.pakholchuk.notes.arch.BaseFragment;
 import com.pakholchuk.notes.contracts.MainContract;
 import com.pakholchuk.notes.data.Note;
 import com.pakholchuk.notes.databinding.FragmentMainBinding;
+import com.pakholchuk.notes.helpers.NoteItemDecoration;
 import com.pakholchuk.notes.helpers.NotesDiffUtilCallback;
 import com.pakholchuk.notes.presenter.MainPresenter;
 import com.pakholchuk.notes.view.NotesAdapter;
@@ -57,7 +57,9 @@ public class MainFragment extends BaseFragment<MainContract.View, MainContract.P
                 RecyclerView.VERTICAL, false);
         recyclerView.setAdapter(recyclerAdapter);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new NoteItemDecoration(30));
     }
+
     @Override
     public void updateList(ArrayList<Note> notes) {
         Log.d("FATAL_TAG", "updateList: " + notes.size());
@@ -66,12 +68,12 @@ public class MainFragment extends BaseFragment<MainContract.View, MainContract.P
 
     @Override
     public void showNote(Bundle bundle) {
-        navController.navigate(R.id.detailsFragment, bundle);
+        navController.navigate(R.id.action_main_to_details, bundle);
     }
 
     @Override
     public void showEditNote(Bundle bundle) {
-        navController.navigate(R.id.action_mainFragment_to_editNoteFragment, bundle);
+        navController.navigate(R.id.action_main_to_edit, bundle);
     }
 
     @Override
@@ -83,6 +85,7 @@ public class MainFragment extends BaseFragment<MainContract.View, MainContract.P
     protected MainContract.Presenter initPresenter() {
         return new MainPresenter();
     }
+
     @Override
     public void onDestroy() {
         recyclerView.setAdapter(null);

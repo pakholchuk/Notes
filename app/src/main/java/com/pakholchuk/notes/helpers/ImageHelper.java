@@ -1,9 +1,7 @@
 package com.pakholchuk.notes.helpers;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
 
 import com.squareup.picasso.Picasso;
@@ -16,14 +14,19 @@ import java.io.OutputStream;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
-import io.reactivex.SingleSource;
-import io.reactivex.functions.Function;
 
 public class ImageHelper {
 
     public Single<Bitmap> loadImage(Uri uriFrom) {
-        return Single.create(emitter -> {
-            emitter.onSuccess(Picasso.get().load(uriFrom).get());
+        Log.d("FATAL", "loadImage:");
+        return Single.create(new SingleOnSubscribe<Bitmap>() {
+            @Override
+            public void subscribe(SingleEmitter<Bitmap> emitter) throws Exception {
+                Log.d("FATAL", "loadImage: before emitter");
+                emitter.onSuccess(Picasso.get().load(uriFrom).get());
+                Log.d("FATAL", "loadImage: after emitter");
+
+            }
         });
     }
 
@@ -33,6 +36,9 @@ public class ImageHelper {
         float ratio = bitmapWidth / bitmapHeight;
         float maxWidthDp = 180;
         float maxHeightDp = 90;
+        if (bitmapWidth < maxWidthDp * density && bitmapHeight < maxHeightDp * density) {
+            return bitmap;
+        }
         Bitmap newBitmap;
         if (ratio > (maxWidthDp / maxHeightDp)) {
             newBitmap = Bitmap.createScaledBitmap(bitmap,
@@ -49,12 +55,15 @@ public class ImageHelper {
     }
 
     public Single<Bitmap> getPreviewBitmap(String pathFrom, float deviceDensity) {
+        Log.d("FATAL_TAG", "getPreviewBitmap: " + pathFrom);
         return loadImage(parseUri(pathFrom))
-                .map(bitmap -> createPreviewBitmap(bitmap, deviceDensity));
+                .doOnSuccess(b -> Log.d("FATAL_TAG", "loaded: " + pathFrom))
+                .map(bitmap -> createPreviewBitmap(bitmap, deviceDensity))
+                .doOnSuccess(b -> Log.d("FATAL_TAG", "afterMap: " + pathFrom));
     }
 
     public String cacheImage(String appImagesDirPath, Bitmap bitmap) throws IOException {
-        Log.d("TAG", "saveImageInApp: " + Thread.currentThread());
+        Log.d("FATAL_TAG", "saveImageInApp: " + Thread.currentThread());
         String name = System.currentTimeMillis() + ".jpg";
         File file = new File(appImagesDirPath, name);
         OutputStream stream = new FileOutputStream(file);
@@ -71,7 +80,7 @@ public class ImageHelper {
     }
 
     public Uri parseUri(String path) {
-        if (!path.startsWith("file://")){
+        if (!path.startsWith("content") && !path.startsWith("file")) {
             path = "file://" + path;
         }
         return Uri.parse(path);
@@ -84,10 +93,10 @@ public class ImageHelper {
     }
 
     public void deleteAllImages(String imagesDirPath) {
-        if (imagesDirPath != null){
+        if (imagesDirPath != null) {
             File dir = new File(imagesDirPath);
             File[] filenames = dir.listFiles();
-            for (File f : filenames){
+            for (File f : filenames) {
                 f.delete();
             }
         }

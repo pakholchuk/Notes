@@ -1,9 +1,8 @@
 package com.pakholchuk.notes.view.fragments;
 
 
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,12 +25,11 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class DetailsFragment extends BaseFragment<DetailsContract.View, DetailsContract.Presenter>
-        implements DetailsContract.View  {
+        implements DetailsContract.View {
     private FragmentDetailsBinding binding;
     private ImageHelper imageHelper = new ImageHelper();
     private String imagePath;
     private CompositeDisposable disposables = new CompositeDisposable();
-
     private NavController navController;
 
     @Override
@@ -60,7 +58,8 @@ public class DetailsFragment extends BaseFragment<DetailsContract.View, DetailsC
         binding.btnDelete.setOnClickListener(v -> presenter.onDeleteClick());
         binding.btnEdit.setOnClickListener(v -> presenter.onEditClick());
         binding.ivPreview.setOnClickListener(v -> presenter.onImageClick());
-        binding.getRoot().setOnClickListener(v->{});
+        binding.getRoot().setOnClickListener(v -> {
+        });
     }
 
     private void fillFields() {
@@ -79,6 +78,7 @@ public class DetailsFragment extends BaseFragment<DetailsContract.View, DetailsC
 
     private void setPreviewImage() {
         disposables.add(imageHelper.getPreviewBitmap(imagePath, getDeviceDensity())
+                .doOnSuccess((bmp) -> Log.d("FATAL ", "onSuccess: "))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(bmp -> binding.ivPreview.setImageBitmap(bmp)));
@@ -90,14 +90,14 @@ public class DetailsFragment extends BaseFragment<DetailsContract.View, DetailsC
 
     @Override
     public void showEditNote(Bundle bundle) {
-        navController.navigate(R.id.action_detailsFragment_to_editNoteFragment, bundle);
+        navController.navigate(R.id.action_details_to_edit, bundle);
     }
 
     @Override
     public void showImage(String imgPath) {
         Bundle bundle = new Bundle();
         bundle.putString(NoteConstants.IMAGE, imgPath);
-        navController.navigate(R.id.action_detailsFragment_to_imageFragment, bundle);
+        navController.navigate(R.id.action_details_to_image, bundle);
     }
 
     @Override
@@ -106,8 +106,9 @@ public class DetailsFragment extends BaseFragment<DetailsContract.View, DetailsC
     }
 
     @Override
-    public void onDestroyView() {
+    public void onDestroy() {
+        Log.d("FATAL", "Details onDestroy: ");
         disposables.dispose();
-        super.onDestroyView();
+        super.onDestroy();
     }
 }

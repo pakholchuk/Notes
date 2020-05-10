@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 public abstract class BaseActivity<V extends BaseContract.View,
         P extends BaseContract.Presenter<V>> extends AppCompatActivity
-        implements BaseContract.View{
+        implements BaseContract.View {
 
     private LifecycleRegistry lifecycleRegistry;
     protected P presenter;
@@ -21,12 +21,12 @@ public abstract class BaseActivity<V extends BaseContract.View,
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        BaseViewModel<V,P> viewModel = new ViewModelProvider(this).get(BaseViewModel.class);
+        BaseViewModel<V, P> viewModel = new ViewModelProvider(this).get(BaseViewModel.class);
         if (viewModel.getPresenter() == null) {
             viewModel.setPresenter(initPresenter());
         }
         presenter = viewModel.getPresenter();
-        presenter.attachView((V)this);
+        presenter.attachView((V) this);
     }
 
     @NonNull

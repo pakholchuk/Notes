@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pakholchuk.notes.R;
@@ -20,7 +19,6 @@ import com.pakholchuk.notes.databinding.ActivityMainNotesBinding;
 import com.pakholchuk.notes.presenter.MainPresenter;
 import com.pakholchuk.notes.view.fragments.DeleteAllDialogFragment;
 
-import java.io.File;
 import java.util.ArrayList;
 
 /*

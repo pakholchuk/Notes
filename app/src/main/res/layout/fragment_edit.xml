@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="300dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     tools:context=".view.fragments.DetailsFragment"
-    android:background="@android:color/darker_gray"
+    android:background="@color/primaryTextColor"
     android:padding="8dp">
 
     <EditText
         android:id="@+id/et_fragment_name"
         style="@style/TextNoteName"
+        android:textColor="@color/primaryDarkColor"
         android:maxLength="18"
         android:hint="@string/hint_name"
         android:layout_width="220dp"
@@ -19,7 +20,7 @@
 
     <EditText
         android:id="@+id/et_fragment_body"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/hint_body"
         android:layout_below="@id/et_fragment_name"
@@ -40,16 +41,6 @@
         android:layout_below="@id/et_fragment_body"
         tools:src="@drawable/ic_attachment_black_24dp" />
 
-    <ProgressBar
-        android:layout_margin="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:id="@+id/progress"
-        android:visibility="gone"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
-
     <ImageView
         android:layout_margin="8dp"
         android:layout_width="wrap_content"
@@ -58,16 +49,6 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:src="@drawable/ic_add_a_photo_black_24dp" />
-
-    <ImageView
-        android:layout_margin="4dp"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:id="@+id/iv_is_done"
-        android:visibility="gone"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/ic_done_black_24dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -82,28 +63,28 @@
             android:text="@string/save"
             android:id="@+id/btn_save"
             android:visibility="gone"
-            android:layout_gravity="center" />
+            style="@style/Button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save"
             android:id="@+id/btn_save_new"
-            android:layout_gravity="center" />
+            style="@style/Button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Button"
             android:text="@string/delete"
-            android:id="@+id/btn_delete"
-            android:layout_gravity="center" />
+            android:id="@+id/btn_delete" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/close"
             android:id="@+id/btn_close"
-            android:layout_gravity="center" />
+            style="@style/Button" />
 
     </LinearLayout>
 </RelativeLayout>

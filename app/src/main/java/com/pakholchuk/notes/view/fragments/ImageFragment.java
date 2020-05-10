@@ -6,15 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.databinding.FragmentImageBinding;
-import com.pakholchuk.notes.view.OnFragmentEventListener;
 import com.squareup.picasso.Picasso;
 
 public class ImageFragment extends Fragment {
     private FragmentImageBinding binding;
-    private OnFragmentEventListener eventListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -22,8 +21,8 @@ public class ImageFragment extends Fragment {
         binding = FragmentImageBinding.inflate(inflater, container, false);
         binding.getRoot().setOnClickListener(v -> {
         });
-        eventListener = (OnFragmentEventListener) getActivity();
-        binding.ivCloseImage.setOnClickListener(eventListener::onFragmentViewClick);
+        binding.ivCloseImage.setOnClickListener((v) ->
+                Navigation.findNavController(binding.getRoot()).popBackStack());
         loadImage();
         return binding.getRoot();
     }

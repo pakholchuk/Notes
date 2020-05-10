@@ -43,7 +43,7 @@ public class EditPresenter extends BasePresenter<EditContract.View>
     @Override
     public void onSaveNewClick(Bundle bundle) {
         getView().close();
-        if (tempImagePath != null){
+        if (tempImagePath != null) {
             bundle.putString(NoteConstants.IMAGE, tempImagePath);
         } else {
             bundle.putString(NoteConstants.IMAGE, "");
@@ -54,7 +54,7 @@ public class EditPresenter extends BasePresenter<EditContract.View>
     @Override
     public void onSaveClick(Bundle bundle) {
         getView().close();
-        if (tempImagePath != null){
+        if (tempImagePath != null) {
             bundle.putString(NoteConstants.IMAGE, tempImagePath);
             if (!note.getImgPath().equals("")) {
                 imageHelper.deleteImage(note.getImgPath());

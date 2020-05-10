@@ -20,7 +20,7 @@ public abstract class BaseFragment<V extends BaseContract.View, P extends BaseCo
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        BaseViewModel<V,P> viewModel = new ViewModelProvider(this).get(BaseViewModel.class);
+        BaseViewModel<V, P> viewModel = new ViewModelProvider(this).get(BaseViewModel.class);
         boolean isPresenterCreated = false;
         if (viewModel.getPresenter() == null) {
             viewModel.setPresenter(initPresenter());

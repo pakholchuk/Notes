@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="300dp"
-    android:maxHeight="500dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     tools:context=".view.fragments.DetailsFragment"
-    android:background="@android:color/darker_gray"
+    android:background="@color/primaryTextColor"
     android:padding="8dp">
 
     <TextView
         android:id="@+id/tv_fragment_name"
         style="@style/TextNoteName"
-        android:layout_width="220dp"
+        android:textColor="@color/primaryDarkColor"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         tools:text="Note1Note1Note1Note1Note1" />
@@ -22,11 +22,12 @@
         android:id="@+id/tv_fragment_editdate"
         tools:text="last edit: 12.04.1234"
         android:layout_below="@id/tv_fragment_name"
+        android:textColor="@color/primaryLightColor"
         style="@style/TextNoteDate" />
 
     <TextView
         android:id="@+id/tv_fragment_body"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_fragment_editdate"
         android:scrollbars="vertical"
@@ -34,6 +35,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:maxLines="16"
+        android:textColor="@color/primaryDarkColor"
         android:textAlignment="viewStart"
         tools:text="lores ipslores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum um lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum " />
 
@@ -53,6 +55,7 @@
         android:id="@+id/tv_fragment_creation_date"
         tools:text="created: 12.04.1234"
         android:layout_below="@id/iv_preview"
+        android:textColor="@color/primaryLightColor"
         style="@style/TextNoteDate" />
 
     <LinearLayout
@@ -67,21 +70,21 @@
             android:layout_height="wrap_content"
             android:text="@string/edit"
             android:id="@+id/btn_edit"
-            android:layout_gravity="center" />
+            style="@style/Button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/delete"
             android:id="@+id/btn_delete"
-            android:layout_gravity="center" />
+            style="@style/Button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/close"
             android:id="@+id/btn_close"
-            android:layout_gravity="center" />
+            style="@style/Button" />
 
     </LinearLayout>
 </RelativeLayout>

@@ -11,13 +11,21 @@ public interface BaseContract {
 
     interface Presenter<V extends BaseContract.View> {
         void attachLifecycle(Lifecycle lifecycle);
+
         void detachLifecycle(Lifecycle lifecycle);
+
         void attachView(V view);
+
         void detachView();
+
         V getView();
+
         Bundle getStateBundle();
+
         boolean isViewAttached();
+
         void onPresenterCreated();
+
         void onPresenterDestroy();
     }
 }

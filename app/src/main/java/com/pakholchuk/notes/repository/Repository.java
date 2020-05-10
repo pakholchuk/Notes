@@ -12,11 +12,11 @@ import com.pakholchuk.notes.repository.database.NoteDao;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -28,7 +28,6 @@ public class Repository implements ContractRepository {
     public Repository() {
         noteDao = App.getInstance().getDatabase().noteDao();
     }
-
 
 
     @Override
@@ -51,12 +50,7 @@ public class Repository implements ContractRepository {
                 b.getString(NoteConstants.IMAGE),
                 creation, edit);
         noteDao.insert(note)
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        Log.d("FATAL_TAG", "insert: " + note.getId());
-                    }
-                })
+                .doOnComplete(() -> Log.d("FATAL_TAG", "insert: " + note.getId()))
                 .subscribeOn(Schedulers.io())
                 .subscribe();
     }
@@ -75,7 +69,6 @@ public class Repository implements ContractRepository {
 
     @Override
     public void delete(Note n) {
-
         noteDao.delete(n)
                 .subscribeOn(Schedulers.io())
                 .subscribe();
@@ -87,7 +80,7 @@ public class Repository implements ContractRepository {
     }
 
     private String getSimpleDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY", Locale.getDefault());
         return sdf.format(new Date(System.currentTimeMillis()));
     }
 

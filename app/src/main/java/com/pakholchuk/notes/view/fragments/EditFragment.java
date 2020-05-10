@@ -2,7 +2,6 @@ package com.pakholchuk.notes.view.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,7 +24,6 @@ import com.pakholchuk.notes.presenter.EditPresenter;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class EditFragment extends BaseFragment<EditContract.View, EditContract.Presenter>
@@ -35,7 +33,7 @@ public class EditFragment extends BaseFragment<EditContract.View, EditContract.P
     private static final int LOAD_PIC_REQUEST_CODE = 22;
 
     private FragmentEditBinding binding;
-    private ImageHelper imageHelper =  new ImageHelper();
+    private ImageHelper imageHelper = new ImageHelper();
     private String defaultStringValue = "";
     private CompositeDisposable disposables = new CompositeDisposable();
     private Bundle arguments;
@@ -79,7 +77,8 @@ public class EditFragment extends BaseFragment<EditContract.View, EditContract.P
         binding.btnDelete.setOnClickListener(v -> presenter.onDeleteClick());
         binding.ivPickImage.setOnClickListener(v -> presenter.onPickImageClick());
         binding.ivPreviewInEditFragment.setOnClickListener(v -> presenter.onImageClick());
-        binding.getRoot().setOnClickListener(v->{});
+        binding.getRoot().setOnClickListener(v -> {
+        });
     }
 
     private Bundle getUserDataBundle() {
@@ -131,7 +130,7 @@ public class EditFragment extends BaseFragment<EditContract.View, EditContract.P
     public void showImage(String imgPath) {
         Bundle bundle = new Bundle();
         bundle.putString(NoteConstants.IMAGE, imgPath);
-        navController.navigate(R.id.action_editNoteFragment_to_imageFragment, bundle);
+        navController.navigate(R.id.action_edit_to_image, bundle);
     }
 
     @Override

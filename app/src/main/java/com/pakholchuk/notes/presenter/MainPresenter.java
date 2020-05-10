@@ -41,7 +41,7 @@ public class MainPresenter extends BasePresenter<MainContract.View> implements M
     @Override
     public void onClearListClicked(String imagesDirPath) {
         disposables.add(repository.clearAll()
-                .doOnComplete(()->imageHelper.deleteAllImages(imagesDirPath))
+                .doOnComplete(() -> imageHelper.deleteAllImages(imagesDirPath))
                 .subscribeOn(Schedulers.io())
                 .subscribe());
     }
