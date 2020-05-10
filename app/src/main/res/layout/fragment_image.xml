@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:maxWidth="400dp"
     android:maxHeight="600dp"
-    tools:context=".view.NoteFragment"
-    android:background="@android:color/darker_gray"
+    tools:context=".view.fragments.DetailsFragment"
+    android:background="@color/primaryTextColor"
     android:padding="4dp">
 
     <ImageView

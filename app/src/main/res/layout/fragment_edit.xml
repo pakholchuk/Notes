@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="300dp"
-    android:maxHeight="500dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    tools:context=".view.NoteFragment"
-    android:background="@android:color/darker_gray"
+    tools:context=".view.fragments.DetailsFragment"
+    android:background="@color/primaryTextColor"
     android:padding="8dp">
 
-    <TextView
-        android:id="@+id/tv_fragment_name"
+    <EditText
+        android:id="@+id/et_fragment_name"
         style="@style/TextNoteName"
+        android:textColor="@color/primaryDarkColor"
+        android:maxLength="18"
+        android:hint="@string/hint_name"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         tools:text="Note1Note1Note1Note1Note1" />
 
-    <TextView
-        android:layout_width="match_parent"
+    <EditText
+        android:id="@+id/et_fragment_body"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_fragment_editdate"
-        tools:text="last edit: 12.04.1234"
-        android:layout_below="@id/tv_fragment_name"
-        style="@style/TextNoteDate" />
-
-    <TextView
-        android:id="@+id/tv_fragment_body"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_fragment_editdate"
-        android:scrollbars="vertical"
+        android:hint="@string/hint_body"
+        android:layout_below="@id/et_fragment_name"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:maxLines="16"
+        android:scrollbars="vertical"
         android:textAlignment="viewStart"
         tools:text="lores ipslores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum um lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum lores ipsum " />
 
@@ -41,47 +37,54 @@
         android:layout_margin="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxHeight="90dp"
-        android:maxWidth="180dp"
-        android:id="@+id/iv_preview"
-        android:layout_below="@id/tv_fragment_body"
+        android:id="@+id/iv_preview_in_edit_fragment"
+        android:layout_below="@id/et_fragment_body"
         tools:src="@drawable/ic_attachment_black_24dp" />
 
-    <TextView
-        android:layout_width="match_parent"
+    <ImageView
+        android:layout_margin="8dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_fragment_creation_date"
-        tools:text="created: 12.04.1234"
-        android:layout_below="@id/iv_preview"
-        style="@style/TextNoteDate" />
+        android:id="@+id/iv_pick_image"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_add_a_photo_black_24dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/tv_fragment_creation_date"
+        android:layout_below="@id/iv_preview_in_edit_fragment"
         android:padding="8dp">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/edit"
-            android:id="@+id/btn_edit"
-            android:layout_gravity="center" />
+            android:text="@string/save"
+            android:id="@+id/btn_save"
+            android:visibility="gone"
+            style="@style/Button" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:id="@+id/btn_save_new"
+            style="@style/Button" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Button"
             android:text="@string/delete"
-            android:id="@+id/btn_delete"
-            android:layout_gravity="center" />
+            android:id="@+id/btn_delete" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/close"
             android:id="@+id/btn_close"
-            android:layout_gravity="center" />
+            style="@style/Button" />
 
     </LinearLayout>
 </RelativeLayout>

@@ -1,40 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="170dp"
-    android:layout_height="wrap_content"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="8dp"
-    android:padding="8dp"
-    android:orientation="vertical"
-    android:background="#A1AFFD">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_item_name"
-        tools:text="NONONONONONONNO"
-        style="@style/TextNoteName"
-        android:textSize="14sp" />
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@color/primaryColor"
+        android:orientation="vertical"
+        android:padding="8dp">
 
         <TextView
+            android:layout_margin="8dp"
+            android:id="@+id/tv_item_name"
+            style="@style/TextNoteName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tv_item_date"
-            style="@style/TextNoteDate"
-            tools:text="datateteare" />
+            android:textSize="14sp"
+            tools:text="NONONONONONONNO" />
 
         <ImageView
             android:id="@+id/iv_attachment"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_attachment_black_24dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:rotation="-90"
             android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_attachment_black_24dp"
             android:visibility="gone"
             tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tv_item_date"
+            style="@style/TextNoteDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_item_name"
+            tools:text="datateteare" />
+
+
     </RelativeLayout>
-</LinearLayout>
+</androidx.cardview.widget.CardView>

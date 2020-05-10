@@ -1,22 +1,23 @@
 package com.pakholchuk.notes.view;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pakholchuk.notes.Contract;
 import com.pakholchuk.notes.R;
+import com.pakholchuk.notes.arch.BaseActivity;
+import com.pakholchuk.notes.contracts.MainContract;
 import com.pakholchuk.notes.data.Note;
-import com.pakholchuk.notes.data.NoteConstants;
 import com.pakholchuk.notes.databinding.ActivityMainNotesBinding;
-import com.pakholchuk.notes.presenter.Presenter;
+import com.pakholchuk.notes.presenter.MainPresenter;
+import com.pakholchuk.notes.view.fragments.DeleteAllDialogFragment;
 
 import java.util.ArrayList;
 
@@ -43,18 +44,17 @@ import java.util.ArrayList;
 *Дата создания;
 *Дата изменения.
  */
-public class MainNotesActivity extends AppCompatActivity implements Contract.ViewContract,
-        NotesAdapter.OnItemClickListener, OnFragmentEventListener,
+public class MainNotesActivity extends BaseActivity<MainContract.View, MainContract.Presenter>
+        implements MainContract.View,
+        NotesAdapter.OnItemClickListener,
         DeleteAllDialogFragment.DialogListener {
 
     private ActivityMainNotesBinding activityBinding;
-    private Contract.PresenterContract presenter;
     private RecyclerView recyclerView;
     private NotesAdapter recyclerAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    private EditNoteFragment editNoteFragment;
     private DialogFragment dialog;
-    private NoteFragment noteFragment;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,12 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
         activityBinding = ActivityMainNotesBinding.inflate(getLayoutInflater());
         setContentView(activityBinding.getRoot());
         init();
-        presenter.viewReady();
+        //presenter.onViewCreated();
+    }
+
+    @Override
+    protected MainContract.Presenter initPresenter() {
+        return new MainPresenter();
     }
 
     @Override
@@ -82,118 +87,37 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
 
     private void init() {
         setSupportActionBar(activityBinding.toolbar);
-        presenter = new Presenter(this);
-        activityBinding.fab.setOnClickListener(view -> presenter.newNotePressed());
-        initRecycler();
+//        activityBinding.fab.setOnClickListener(v -> presenter.onNewNoteClicked());
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+//        initRecycler();
     }
 
-    private void initRecycler() {
-        recyclerView = activityBinding.contentMain.recyclerMain;
-        recyclerAdapter = new NotesAdapter(this);
-        layoutManager = new GridLayoutManager(this, 2, RecyclerView.VERTICAL, false);
-        recyclerView.setAdapter(recyclerAdapter);
-        recyclerView.setLayoutManager(layoutManager);
-    }
+//    private void initRecycler() {
+//        recyclerView = activityBinding.contentMain.recyclerMain;
+//        recyclerAdapter = new NotesAdapter(this);
+//        layoutManager = new GridLayoutManager(this, 2, RecyclerView.VERTICAL, true);
+//        recyclerView.setAdapter(recyclerAdapter);
+//        recyclerView.setLayoutManager(layoutManager);
+//    }
 
     @Override
     public void updateList(ArrayList<Note> notes) {
-        recyclerAdapter.updateNotesList(notes);
+        recyclerAdapter.submitList(notes);
     }
-
 
     @Override
     public void showNote(Bundle bundle) {
-        noteFragment = new NoteFragment();
-        noteFragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.main_container, noteFragment, NoteFragment.TAG_SHOW)
-                .addToBackStack(NoteFragment.TAG_SHOW)
-                .commit();
+        navController.navigate(R.id.detailsFragment, bundle);
     }
 
     @Override
-    public void showEditNote(String tag, Bundle bundle) {
-        editNoteFragment = new EditNoteFragment();
-        editNoteFragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_container, editNoteFragment, tag)
-                .addToBackStack(tag)
-                .commit();
+    public void showEditNote(Bundle bundle) {
+        navController.navigate(R.id.editNoteFragment, bundle);
     }
 
     @Override
-    public Bundle getDataFromUser() {
-        return editNoteFragment.getData();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
-            getSupportFragmentManager().popBackStack();
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    public String getCachedImagePath() {
-        return editNoteFragment.getCachedImagePath();
-    }
-
-    @Override
-    public void showImage(String imgPath) {
-        ImageFragment imageFragment = new ImageFragment();
-        Bundle b = new Bundle();
-        b.putString(NoteConstants.IMAGE, imgPath);
-        imageFragment.setArguments(b);
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.image_container, imageFragment)
-                .addToBackStack(NoteConstants.IMAGE)
-                .commit();
-    }
-
-    @Override
-    public void closeNote() {
-        if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
-            getSupportFragmentManager().popBackStack();
-        }
-    }
-    @Override
-    public void onItemClick(int position, long noteId) {
-        presenter.itemClicked(position, noteId);
-    }
-
-    @Override
-    public void onFragmentViewClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_save_new: {
-                presenter.add();
-                break;
-            }
-            case R.id.btn_save: {
-                presenter.save();
-            }
-            case R.id.btn_close:
-            case R.id.iv_close_image: {
-                closeNote();
-                break;
-            }
-            case R.id.btn_delete: {
-                presenter.delete();
-                break;
-            }
-            case R.id.btn_edit: {
-                presenter.edit();
-                break;
-            }
-            case (R.id.iv_preview_in_edit_fragment): {
-                presenter.cachedImagePressed();
-            }
-            case R.id.iv_preview: {
-                presenter.imagePressed();
-            }
-            default:
-                break;
-        }
+    public void onItemClick(long noteId) {
+        presenter.onItemClicked(noteId);
     }
 
     private void showOptionsDialog() {
@@ -203,7 +127,11 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
 
     @Override
     public void onDialogPositiveClick() {
-        presenter.clearList();
+        presenter.onClearListClicked(getImagesDirPath());
+    }
+
+    private String getImagesDirPath() {
+        return (this.getExternalFilesDir(Environment.DIRECTORY_PICTURES)).toString();
     }
 
     @Override
@@ -213,9 +141,7 @@ public class MainNotesActivity extends AppCompatActivity implements Contract.Vie
 
     @Override
     protected void onDestroy() {
-        recyclerView.setAdapter(null);
-        presenter.onActivityDestroyed();
+//        recyclerView.setAdapter(null);
         super.onDestroy();
-
     }
 }
